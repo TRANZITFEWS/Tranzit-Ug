@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b6b3a">
+  <title>Tranzit.ug — Uganda's Online Marketplace</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="brand" href="#">tranzit<span>.ug</span></a>
+  <div class="actions"><button id="accountBtn">Account</button><button id="cartBtn">Cart <b id="cartCount">0</b></button></div>
+</header>
+
+<section class="searchbar">
+  <input id="search" type="search" placeholder="Search products, shops and categories">
+  <button onclick="runSearch()">Search</button>
+</section>
+
+<nav id="categories">
+  <button data-cat="All" class="active">All</button>
+  <button data-cat="Electronics">Electronics</button>
+  <button data-cat="Fashion">Fashion</button>
+  <button data-cat="Home">Home</button>
+  <button data-cat="Phones">Phones</button>
+  <button data-cat="Beauty">Beauty</button>
+</nav>
+
+<main>
+  <section class="hero">
+    <div><small>BUY • SELL • DISCOVER</small><h1>Uganda's marketplace,<br>built for everyone.</h1>
+    <p>Discover products from sellers across Uganda and build your shop on Tranzit.ug.</p>
+    <button onclick="document.querySelector('#products').scrollIntoView({behavior:'smooth'})">Shop now</button></div>
+    <div class="hero-card"><strong>Sell on Tranzit</strong><p>Reach customers and grow your business.</p><button id="sellerBtn">Start selling</button></div>
+  </section>
+
+  <section class="section-head"><div><small>MARKETPLACE</small><h2>Featured products</h2></div><span id="resultText"></span></section>
+  <section id="products" class="grid"></section>
+
+  <section class="seller">
+    <div><small>FOR UGANDAN BUSINESSES</small><h2>Open your Tranzit shop</h2><p>Create listings, reach customers and manage your marketplace presence.</p></div>
+    <button id="sellerBtn2">Become a seller</button>
+  </section>
+</main>
+
+<div id="drawer" class="drawer">
+ <div class="drawer-head"><h2>Your cart</h2><button onclick="closeDrawer()">×</button></div>
+ <div id="cartItems"></div>
+ <div class="total"><span>Total</span><strong id="total">UGX 0</strong></div>
+ <button class="checkout">Checkout</button>
+</div>
+<div id="overlay" class="overlay" onclick="closeDrawer()"></div>
+
+<footer><b>tranzit.ug</b><span>Uganda's online marketplace</span><span>© 2026 Tranzit.ug</span></footer>
+<script src="app.js"></script>
+</body>
+</html>
