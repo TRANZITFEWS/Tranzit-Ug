@@ -19,3 +19,13 @@ document.querySelector("#cartBtn").onclick=showCart;
 document.querySelector("#accountBtn").onclick=()=>alert("Customer accounts will be connected in the next development stage.");
 document.querySelectorAll("#sellerBtn,#sellerBtn2").forEach(b=>b.onclick=()=>alert("Seller registration will be connected in the next development stage."));
 render();
+const menuBtn = document.querySelector("#menuBtn");
+const menuPanel = document.querySelector("#menuPanel");
+
+menuBtn.onclick = () => {
+  menuPanel.classList.toggle("open");
+};
+
+menuPanel.querySelectorAll("a").forEach(link => {
+  link.onclick = () => menuPanel.classList.remove("open");
+});
