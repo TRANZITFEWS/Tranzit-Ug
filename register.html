@@ -101,7 +101,7 @@
     <input type="password" placeholder="Password">
     <input type="password" placeholder="Confirm password">
 
-    <button type="button">Create Account</button>
+   <button type="button" onclick="createAccount()">Create Account</button>
 
     <div class="login">
       Already have an account?
@@ -110,6 +110,45 @@
 
   </div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ <script>
+const SUPABASE_URL = 'https://mvqzrkaxuthhkicclfaf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_8iaoevUboXIPBkja1GvozA_SCI5-m8f';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+ async function createAccount() {
+ const inputs = document.querySelectorAll('input');
+const fullName = inputs[0].value.trim();
+const email = inputs[1].value.trim();
+const phone = inputs[2].value.trim();
+const password = inputs[3].value;
+const confirmPassword = inputs[4].value;  
+  if (!fullName || !email || !phone || !password || !confirmPassword) {
+  alert('Please fill in all fields.');
+  return;
+}
 
+if (password !== confirmPassword) {
+  alert('Passwords do not match.');
+  return;
+} 
+   const { data, error } = await supabaseClient.auth.signUp({
+  email: email,
+  password: password,
+  options: {
+    data: {
+      full_name: fullName,
+      phone: phone
+    }
+  }
+});
+if (error) {
+  alert(error.message);
+  return;
+}
+
+alert('Account created successfully! Please check your email to confirm your account.');
+window.location.href = 'account.html';   
+}  
+</script> 
 </body>
 </html>
