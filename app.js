@@ -16,7 +16,6 @@ function add(name){cart.push(data.find(x=>x.name===name));document.querySelector
 function showCart(){document.querySelector("#drawer").classList.add("open");document.querySelector("#overlay").classList.add("show");document.querySelector("#cartItems").innerHTML=cart.length?cart.map(x=>`<div class="cart-row"><span>${x.icon} ${x.name}</span><b>${fmt(x.price)}</b></div>`).join(""):"<p>Your cart is empty.</p>";document.querySelector("#total").textContent=fmt(cart.reduce((s,x)=>s+x.price,0))}
 function closeDrawer(){document.querySelector("#drawer").classList.remove("open");document.querySelector("#overlay").classList.remove("show")}
 document.querySelector("#cartBtn").onclick=showCart;
-document.querySelector("#accountBtn").onclick=()=>alert("Customer accounts will be connected in the next development stage.");
 document.querySelectorAll("#sellerBtn,#sellerBtn2").forEach(b=>b.onclick=()=>alert("Seller registration will be connected in the next development stage."));
 render();
 const menuBtn = document.querySelector("#menuBtn");
