@@ -127,6 +127,26 @@ const SUPABASE_KEY = 'sb_publishable_8iaoevUboXIPBkja1GvozA_SCI5-m8f';
   alert("Login successful!");
   window.location.href = "index.html";
 }
+async function resetPassword() {
+  const email = document.querySelector('input[type="email"]').value.trim();
+
+  if (!email) {
+    alert("Please enter your email address first.");
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: "https://tranzit.ug/reset-password.html"
+  });
+
+  if (error) {
+    alert("Password reset failed: " + error.message);
+    return;
+  }
+
+  alert("Password reset email sent! Please check your inbox.");
+}
+  
 </script>
 </body>
 </html>
