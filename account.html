@@ -93,12 +93,40 @@
     <input type="email" placeholder="Email address">
     <input type="password" placeholder="Password">
 
-    <button type="button">Log In</button>
+   <button type="button" onclick="loginUser()">Log In</button>
     <button type="button" class="signup" onclick="window.location.href='register.html'">Create Account</button>
 
     <a class="back" href="index.html">← Back to marketplace</a>
   </div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+  const SUPABASE_URL = 'https://mvqzrkaxuthhkicc1faf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_8iaoevUboXIPBkja1GvozA_SCI5-m8f';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  async function loginUser() {
+  const email = document.querySelector('input[type="email"]').value.trim();
+  const password = document.querySelector('input[type="password"]').value;
+
+  if (!email || !password) {
+    alert("Please enter your email and password.");
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    alert("Login failed: " + error.message);
+    return;
+  }
+
+  alert("Login successful!");
+  window.location.href = "index.html";
+}
+</script>
 </body>
 </html>
