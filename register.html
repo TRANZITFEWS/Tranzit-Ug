@@ -4,151 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Account | Tranzit.ug</title>
-
   <style>
     * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f8f6;
-      color: #123c27;
-    }
-
-    header {
-      background: white;
-      padding: 24px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .logo {
-      font-size: 32px;
-      font-weight: bold;
-      color: #123c27;
-      text-decoration: none;
-    }
-
-    .logo span {
-      color: #e8873a;
-    }
-
-    main {
-      padding: 50px 22px;
-      display: flex;
-      justify-content: center;
-    }
-
-    .card {
-      background: white;
-      width: 100%;
-      max-width: 430px;
-      padding: 28px;
-      border-radius: 24px;
-    }
-
-    h1 {
-      font-size: 34px;
-      margin-top: 0;
-    }
-
-    input {
-      width: 100%;
-      padding: 17px;
-      margin: 8px 0;
-      border: 1px solid #bbb;
-      border-radius: 12px;
-      font-size: 17px;
-    }
-
-    button {
-      width: 100%;
-      padding: 17px;
-      margin-top: 14px;
-      border: 0;
-      border-radius: 12px;
-      background: #123c27;
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    .login {
-      text-align: center;
-      margin-top: 24px;
-    }
-
-    a {
-      color: #123c27;
-    }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f7f8f6; color: #123c27; }
+    header { background: white; padding: 24px; border-bottom: 1px solid #ddd; }
+    .logo { font-size: 32px; font-weight: bold; color: #123c27; text-decoration: none; }
+    .logo span { color: #e8873a; }
+    main { padding: 50px 22px; display: flex; justify-content: center; }
+    .card { background: white; width: 100%; max-width: 430px; padding: 28px; border-radius: 24px; }
+    h1 { font-size: 34px; margin-top: 0; }
+    input { width: 100%; padding: 17px; margin: 8px 0; border: 1px solid #bbb; border-radius: 12px; font-size: 17px; }
+    button { width: 100%; padding: 17px; margin-top: 14px; border: 0; border-radius: 12px; background: #123c27; color: white; font-size: 18px; font-weight: bold; cursor: pointer; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .login { text-align: center; margin-top: 24px; }
+    a { color: #123c27; }
+    .error { color: #c0392b; margin-top: 12px; font-size: 15px; display: none; }
+    .success { color: #0d6b3c; margin-top: 12px; font-size: 15px; display: none; }
   </style>
 </head>
-
 <body>
-
 <header>
   <a class="logo" href="index.html">tranzit<span>.ug</span></a>
 </header>
 
 <main>
   <div class="card">
-
     <h1>Create Account</h1>
     <p>Join Tranzit.ug and start buying and selling across Uganda.</p>
 
-    <input type="text" placeholder="Full name">
-    <input type="email" placeholder="Email address">
-    <input type="tel" placeholder="Phone number">
-    <input type="password" placeholder="Password">
-    <input type="password" placeholder="Confirm password">
+    <input id="fullName" type="text" placeholder="Full name" required>
+    <input id="email" type="email" placeholder="Email address" required>
+    <input id="phone" type="tel" placeholder="Phone number (e.g. 0772...)" required>
+    <input id="password" type="password" placeholder="Password (min 6 characters)" required>
+    <input id="confirmPassword" type="password" placeholder="Confirm password" required>
 
-   <button type="button" onclick="createAccount()">Create Account</button>
+    <button id="createBtn" onclick="createAccount()">Create Account</button>
+    <div id="errorMsg" class="error"></div>
+    <div id="successMsg" class="success"></div>
 
     <div class="login">
       Already have an account?
       <a href="account.html">Log In</a>
     </div>
-
   </div>
 </main>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- <script>
-const SUPABASE_URL = 'https://mvqzrkaxuthhkicclfaf.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_8iaoevUboXIPBkja1GvozA_SCI5-m8f';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
- async function createAccount() {
- const inputs = document.querySelectorAll('input');
-const fullName = inputs[0].value.trim();
-const email = inputs[1].value.trim();
-const phone = inputs[2].value.trim();
-const password = inputs[3].value;
-const confirmPassword = inputs[4].value;  
-  if (!fullName || !email || !phone || !password || !confirmPassword) {
-  alert('Please fill in all fields.');
-  return;
-}
+<script>
+  const SUPABASE_URL = 'https://mvqzrkaxuthhkicclfaf.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_8iaoevUboXIPBkja1GvozA_SCI5-m8f';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-if (password !== confirmPassword) {
-  alert('Passwords do not match.');
-  return;
-} 
-   const { data, error } = await supabaseClient.auth.signUp({
-  email: email,
-  password: password,
-  options: {
-    data: {
-      full_name: fullName,
-      phone: phone
+  async function createAccount() {
+    const fullName = document.getElementById('fullName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const btn = document.getElementById('createBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
+
+    errorMsg.style.display = 'none';
+    successMsg.style.display = 'none';
+
+    if (!fullName || !email || !phone || !password) {
+      errorMsg.textContent = 'Please fill in all fields.';
+      errorMsg.style.display = 'block';
+      return;
     }
-  }
-});
-if (error) {
-  alert(error.message);
-  return;
-}
+    if (password.length < 6) {
+      errorMsg.textContent = 'Password must be at least 6 characters.';
+      errorMsg.style.display = 'block';
+      return;
+    }
+    if (password !== confirmPassword) {
+      errorMsg.textContent = 'Passwords do not match.';
+      errorMsg.style.display = 'block';
+      return;
+    }
 
-alert('Account created successfully! Please check your email to confirm your account.');
-window.location.href = 'account.html';   
-}  
-</script> 
+    btn.disabled = true;
+    btn.textContent = 'Creating account...';
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          full_name: fullName,
+          phone: phone
+        }
+      }
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Create Account';
+
+    if (error) {
+      errorMsg.textContent = error.message;
+      errorMsg.style.display = 'block';
+      return;
+    }
+
+    successMsg.textContent = 'Account created! Check your email to confirm, then log in.';
+    successMsg.style.display = 'block';
+    
+    // Optional: redirect after a few seconds
+    setTimeout(() => {
+      window.location.href = 'account.html';
+    }, 2500);
+  }
+</script>
 </body>
 </html>
