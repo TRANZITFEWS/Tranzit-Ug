@@ -97,10 +97,9 @@ document.querySelectorAll("#sellerBtn, #sellerBtn2").forEach(b => {
       window.location.href = "account.html";
       return;
     }
-    alert("Seller registration will be connected in the next development stage.");
+    window.location.href = "seller.html";
   };
 });
-
 // Menu
 const menuBtn = document.querySelector("#menuBtn");
 const menuPanel = document.querySelector("#menuPanel");
