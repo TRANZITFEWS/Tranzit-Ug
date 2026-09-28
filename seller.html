@@ -296,7 +296,7 @@
 
     const { data, error } = await supabaseClient
       .from('orders')
-      .select('*')
+      .select('*, order_items(*)')
       .order('created_at', { ascending: false })
       .limit(20);
 
@@ -310,15 +310,21 @@
       return;
     }
 
-    list.innerHTML = data.map(o => `
-      <div class="product-item">
-        <div>
-          <strong>${o.buyer_name || 'Customer'}</strong>
-          <span>${o.buyer_phone || ''} • ${o.buyer_location || ''}</span>
-          <span>UGX ${Number(o.total).toLocaleString()} • ${o.status}</span>
+    list.innerHTML = data.map(o => {
+      const items = (o.order_items || [])
+        .map(i => i.product_name + ' x' + i.quantity)
+        .join(', ');
+      return `
+        <div class="product-item">
+          <div>
+            <strong>${o.buyer_name || 'Customer'}</strong>
+            <span>${o.buyer_phone || ''} • ${o.buyer_location || ''}</span>
+            <span>${items || 'No items listed'}</span>
+            <span>UGX ${Number(o.total).toLocaleString()} • ${o.status}</span>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
   init();
 </script>
