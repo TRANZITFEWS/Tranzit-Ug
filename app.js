@@ -116,7 +116,64 @@ if (menuBtn && menuPanel) {
     link.onclick = () => menuPanel.classList.remove("open");
   });
 }
+async function checkout() {
+  if (!cart.length) {
+    alert("Your cart is empty.");
+    return;
+  }
+  if (!currentUser) {
+    alert("Please log in first.");
+    window.location.href = "account.html";
+    return;
+  }
 
+  const phone = prompt("Phone number for delivery:");
+  if (!phone) return;
+  const location = prompt("Delivery location:");
+  if (!location) return;
+
+  const total = cart.reduce((s, x) => s + x.price, 0);
+
+  const { data: order, error } = await supabaseClient
+    .from("orders")
+    .insert({
+      buyer_id: currentUser.id,
+      buyer_name: currentUser.email,
+      buyer_phone: phone,
+      buyer_location: location,
+      total: total,
+      status: "pending"
+    })
+    .select()
+    .single();
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  const items = cart.map(x => ({
+    order_id: order.id,
+    product_id: x.id,
+    product_name: x.name,
+    price: x.price,
+    quantity: 1
+  }));
+
+  const { error: itemError } = await supabaseClient
+    .from("order_items")
+    .insert(items);
+
+  if (itemError) {
+    alert(itemError.message);
+    return;
+  }
+
+  cart = [];
+  document.querySelector("#cartCount").textContent = 0;
+  closeDrawer();
+  alert("Order placed! We will contact you on " + phone);
+}
 // Start
 loadProducts();
 checkAuth();
