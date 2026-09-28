@@ -123,26 +123,28 @@
       .from('shops')
       .select('*')
       .eq('owner_id', currentUser.id)
-      .maybeSingle();
+      .limit(1);
 
     if (error) {
-      console.error(error);
+      document.getElementById('createShopSection').classList.remove('hidden');
+      const msg = document.getElementById('shopMsg');
+      msg.className = 'msg error';
+      msg.textContent = error.message;
       return;
     }
 
-    if (!data) {
+    if (!data || data.length === 0) {
       document.getElementById('createShopSection').classList.remove('hidden');
     } else {
-      myShop = data;
+      myShop = data[0];
       document.getElementById('dashboard').classList.remove('hidden');
       document.getElementById('productsSection').classList.remove('hidden');
-      document.getElementById('shopTitle').textContent = data.name;
-      document.getElementById('shopInfo').textContent = 
-        (data.location || '') + (data.phone ? ' • ' + data.phone : '');
+      document.getElementById('shopTitle').textContent = myShop.name;
+      document.getElementById('shopInfo').textContent =
+        (myShop.location || '') + (myShop.phone ? ' • ' + myShop.phone : '');
       loadMyProducts();
     }
   }
-
   async function createShop() {
     const name = document.getElementById('shopName').value.trim();
     const location = document.getElementById('shopLocation').value.trim();
