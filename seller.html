@@ -84,7 +84,7 @@
       <option value="Other">Other</option>
     </select>
     <textarea id="prodDescription" placeholder="Product description"></textarea>
-    <input id="prodImage" type="text" placeholder="Image URL (optional for now)">
+<input id="prodImage" type="file" accept="image/*">
     <button onclick="addProduct()">Save Product</button>
     <button onclick="hideAddProduct()" style="background:#666; margin-left:8px;">Cancel</button>
   </div>
@@ -192,7 +192,67 @@
   function hideAddProduct() {
     document.getElementById('addProductSection').classList.add('hidden');
   }
+  async function addProduct() {
+    const name = document.getElementById('prodName').value.trim();
+    const price = Number(document.getElementById('prodPrice').value);
+    const category = document.getElementById('prodCategory').value;
+    const description = document.getElementById('prodDescription').value.trim();
+    const fileInput = document.getElementById('prodImage');
+    const msg = document.getElementById('productMsg');
 
+    if (!name || !price || price < 0) {
+      msg.className = 'msg error';
+      msg.textContent = 'Name and valid price are required.';
+      return;
+    }
+
+    let image_url = null;
+    const file = fileInput.files && fileInput.files[0];
+
+    if (file) {
+      const ext = file.name.split('.').pop();
+      const filePath = currentUser.id + '/' + Date.now() + '.' + ext;
+      const { error: uploadError } = await supabaseClient.storage
+        .from('product-images')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        msg.className = 'msg error';
+        msg.textContent = uploadError.message;
+        return;
+      }
+
+      const { data: pub } = supabaseClient.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+      image_url = pub.publicUrl;
+    }
+
+    const { error } = await supabaseClient
+      .from('products')
+      .insert({
+        shop_id: myShop.id,
+        name,
+        price,
+        category,
+        description,
+        image_url
+      });
+
+    if (error) {
+      msg.className = 'msg error';
+      msg.textContent = error.message;
+      return;
+    }
+
+    msg.className = 'msg success';
+    msg.textContent = 'Product added successfully!';
+    document.getElementById('prodName').value = '';
+    document.getElementById('prodPrice').value = '';
+    document.getElementById('prodDescription').value = '';
+    fileInput.value = '';
+    loadMyProducts();
+  }
 
   async function loadMyProducts() {
     if (!myShop) return;
