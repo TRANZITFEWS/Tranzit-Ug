@@ -193,45 +193,6 @@
     document.getElementById('addProductSection').classList.add('hidden');
   }
 
-  async function addProduct() {
-    const name = document.getElementById('prodName').value.trim();
-    const price = Number(document.getElementById('prodPrice').value);
-    const category = document.getElementById('prodCategory').value;
-    const description = document.getElementById('prodDescription').value.trim();
-    const image_url = document.getElementById('prodImage').value.trim();
-    const msg = document.getElementById('productMsg');
-
-    if (!name || !price || price < 0) {
-      msg.className = 'msg error';
-      msg.textContent = 'Name and valid price are required.';
-      return;
-    }
-
-    const { error } = await supabaseClient
-      .from('products')
-      .insert({
-        shop_id: myShop.id,
-        name,
-        price,
-        category,
-        description,
-        image_url: image_url || null
-      });
-
-    if (error) {
-      msg.className = 'msg error';
-      msg.textContent = error.message;
-      return;
-    }
-
-    msg.className = 'msg success';
-    msg.textContent = 'Product added successfully!';
-    document.getElementById('prodName').value = '';
-    document.getElementById('prodPrice').value = '';
-    document.getElementById('prodDescription').value = '';
-    document.getElementById('prodImage').value = '';
-    loadMyProducts();
-  }
 
   async function loadMyProducts() {
     if (!myShop) return;
