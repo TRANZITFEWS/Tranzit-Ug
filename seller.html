@@ -88,7 +88,10 @@
     <button onclick="addProduct()">Save Product</button>
     <button onclick="hideAddProduct()" style="background:#666; margin-left:8px;">Cancel</button>
   </div>
-
+  <div id="ordersSection" class="card hidden">
+    <h2>Incoming Orders</h2>
+    <div id="ordersList"></div>
+  </div>
   <!-- My Products -->
   <div id="productsSection" class="card hidden">
     <h2>My Products</h2>
@@ -143,6 +146,8 @@
       document.getElementById('shopInfo').textContent =
         (myShop.location || '') + (myShop.phone ? ' • ' + myShop.phone : '');
       loadMyProducts();
+      document.getElementById('ordersSection').classList.remove('hidden');
+      loadOrders();
     }
   }
   async function createShop() {
@@ -285,7 +290,36 @@
     await supabaseClient.from('products').delete().eq('id', id);
     loadMyProducts();
   }
+  async function loadOrders() {
+    const list = document.getElementById('ordersList');
+    if (!list) return;
 
+    const { data, error } = await supabaseClient
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) {
+      list.innerHTML = '<p>' + error.message + '</p>';
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      list.innerHTML = '<p>No orders yet.</p>';
+      return;
+    }
+
+    list.innerHTML = data.map(o => `
+      <div class="product-item">
+        <div>
+          <strong>${o.buyer_name || 'Customer'}</strong>
+          <span>${o.buyer_phone || ''} • ${o.buyer_location || ''}</span>
+          <span>UGX ${Number(o.total).toLocaleString()} • ${o.status}</span>
+        </div>
+      </div>
+    `).join('');
+  }
   init();
 </script>
 </body>
