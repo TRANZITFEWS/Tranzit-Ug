@@ -4,22 +4,34 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 
-const data = [
-  {name:"Smartphone X",cat:"Phones",price:850000,icon:"📱"},
-  {name:"Wireless Headphones",cat:"Electronics",price:120000,icon:"🎧"},
-  {name:"Classic Sneakers",cat:"Fashion",price:95000,icon:"👟"},
-  {name:"Blender",cat:"Home",price:145000,icon:"🥤"},
-  {name:"Smart Watch",cat:"Electronics",price:180000,icon:"⌚"},
-  {name:"Travel Backpack",cat:"Fashion",price:78000,icon:"🎒"},
-  {name:"Skin Care Set",cat:"Beauty",price:65000,icon:"🧴"},
-  {name:"Table Lamp",cat:"Home",price:55000,icon:"💡"}
-];
-
+let data = [];
 let cat = "All", cart = [];
-const fmt = n => "UGX " + n.toLocaleString();
+const fmt = n => "UGX " + Number(n).toLocaleString();
+
+async function loadProducts() {
+  const { data: rows, error } = await supabaseClient
+    .from("products")
+    .select("*")
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
+  data = (rows || []).map(p => ({
+    id: p.id,
+    name: p.name,
+    cat: p.category || "Other",
+    price: Number(p.price),
+    icon: p.image_url ? "🛍️" : "📦"
+  }));
+
+  if (error) {
+    console.error(error);
+  }
+  render();
+}
 
 function render() {
-  let q = document.querySelector("#search").value.toLowerCase();
+  const searchBox = document.querySelector("#search");
+  let q = searchBox ? searchBox.value.toLowerCase() : "";
   let rows = data.filter(x => (cat === "All" || x.cat === cat) && x.name.toLowerCase().includes(q));
   document.querySelector("#resultText").textContent = rows.length + " products";
   document.querySelector("#products").innerHTML = rows.map(x =>
@@ -29,30 +41,19 @@ function render() {
         <small>${x.cat}</small>
         <h3>${x.name}</h3>
         <div class="price">${fmt(x.price)}</div>
-        <button onclick="add('${x.name}')">Add to cart</button>
+        <button onclick="add('${x.id}')">Add to cart</button>
       </div>
     </article>`
   ).join("") || "<p>No products found.</p>";
 }
 
-function runSearch() { render(); }
-document.querySelector("#search").addEventListener("input", render);
-
-document.querySelectorAll("#categories button").forEach(b => {
-  b.onclick = () => {
-    document.querySelectorAll("#categories button").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    cat = b.dataset.cat;
-    render();
-  };
-});
-
-function add(name) {
-  cart.push(data.find(x => x.name === name));
+function add(id) {
+  const item = data.find(x => x.id === id);
+  if (!item) return;
+  cart.push(item);
   document.querySelector("#cartCount").textContent = cart.length;
   showCart();
 }
-
 function showCart() {
   document.querySelector("#drawer").classList.add("open");
   document.querySelector("#overlay").classList.add("show");
@@ -112,5 +113,5 @@ if (menuBtn && menuPanel) {
 }
 
 // Start
-render();
+loadProducts();
 checkAuth();
