@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller Dashboard | Tranzit.ug</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f7f8f6; color: #123c27; }
+    header { background: white; padding: 16px 5%; border-bottom: 1px solid #e4e8e4; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 26px; font-weight: 900; text-decoration: none; color: #123c27; }
+    .logo span { color: #ef7f2d; }
+    .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+    .card { background: white; border-radius: 18px; padding: 28px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,.06); }
+    h1 { margin-top: 0; font-size: 28px; }
+    h2 { font-size: 20px; margin: 0 0 16px; }
+    input, textarea, select { width: 100%; padding: 14px; margin: 8px 0 16px; border: 1px solid #ccc; border-radius: 10px; font-size: 16px; }
+    textarea { min-height: 90px; resize: vertical; }
+    button { padding: 14px 22px; border: 0; border-radius: 10px; background: #123c27; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button.secondary { background: #ef7f2d; }
+    button.danger { background: #c0392b; }
+    .hidden { display: none; }
+    .product-list { display: grid; gap: 12px; }
+    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; border: 1px solid #e4e8e4; border-radius: 12px; }
+    .product-item strong { display: block; }
+    .msg { padding: 12px; border-radius: 10px; margin-bottom: 16px; display: none; }
+    .msg.success { background: #e8f8ef; color: #0d6b3c; display: block; }
+    .msg.error { background: #fdecea; color: #c0392b; display: block; }
+    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">tranzit<span>.ug</span></a>
+  <div>
+    <a href="index.html" style="margin-right:12px; color:#123c27;">Marketplace</a>
+    <a href="account.html" style="color:#123c27;">Account</a>
+  </div>
+</header>
+
+<div class="container">
+  <div id="loading" class="card">Checking your account...</div>
+
+  <div id="notLoggedIn" class="card hidden">
+    <h1>Seller Dashboard</h1>
+    <p>You need to log in first.</p>
+    <button onclick="window.location.href='account.html'">Go to Login</button>
+  </div>
+
+  <!-- Create Shop Form -->
+  <div id="createShopSection" class="card hidden">
+    <h1>Create your shop</h1>
+    <p>Set up your shop to start selling on Tranzit.ug</p>
+    <div id="shopMsg" class="msg"></div>
+    <input id="shopName" type="text" placeholder="Shop name *" required>
+    <input id="shopLocation" type="text" placeholder="Location (e.g. Kampala, Nakawa)">
+    <input id="shopPhone" type="tel" placeholder="Phone number">
+    <textarea id="shopDescription" placeholder="Short description of your shop"></textarea>
+    <button onclick="createShop()">Create Shop</button>
+  </div>
+
+  <!-- Dashboard (after shop exists) -->
+  <div id="dashboard" class="card hidden">
+    <h1 id="shopTitle">My Shop</h1>
+    <p id="shopInfo"></p>
+    <div class="top-actions">
+      <button class="secondary" onclick="showAddProduct()">+ Add Product</button>
+      <button onclick="loadMyProducts()">Refresh Products</button>
+    </div>
+  </div>
+
+  <!-- Add Product Form -->
+  <div id="addProductSection" class="card hidden">
+    <h2>Add New Product</h2>
+    <div id="productMsg" class="msg"></div>
+    <input id="prodName" type="text" placeholder="Product name *" required>
+    <input id="prodPrice" type="number" placeholder="Price in UGX *" min="0" required>
+    <select id="prodCategory">
+      <option value="Electronics">Electronics</option>
+      <option value="Fashion">Fashion</option>
+      <option value="Home">Home</option>
+      <option value="Phones">Phones</option>
+      <option value="Beauty">Beauty</option>
+      <option value="Other">Other</option>
+    </select>
+    <textarea id="prodDescription" placeholder="Product description"></textarea>
+    <input id="prodImage" type="text" placeholder="Image URL (optional for now)">
+    <button onclick="addProduct()">Save Product</button>
+    <button onclick="hideAddProduct()" style="background:#666; margin-left:8px;">Cancel</button>
+  </div>
+
+  <!-- My Products -->
+  <div id="productsSection" class="card hidden">
+    <h2>My Products</h2>
+    <div id="productList" class="product-list"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://mvqzrkaxuthhkicclfaf.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_8iaoevUboXIPBkja1GvozA_SCI5-m8f';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentUser = null;
+  let myShop = null;
+
+  async function init() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    document.getElementById('loading').classList.add('hidden');
+
+    if (!user) {
+      document.getElementById('notLoggedIn').classList.remove('hidden');
+      return;
+    }
+
+    currentUser = user;
+    await loadShop();
+  }
+
+  async function loadShop() {
+    const { data, error } = await supabaseClient
+      .from('shops')
+      .select('*')
+      .eq('owner_id', currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    if (!data) {
+      document.getElementById('createShopSection').classList.remove('hidden');
+    } else {
+      myShop = data;
+      document.getElementById('dashboard').classList.remove('hidden');
+      document.getElementById('productsSection').classList.remove('hidden');
+      document.getElementById('shopTitle').textContent = data.name;
+      document.getElementById('shopInfo').textContent = 
+        (data.location || '') + (data.phone ? ' • ' + data.phone : '');
+      loadMyProducts();
+    }
+  }
+
+  async function createShop() {
+    const name = document.getElementById('shopName').value.trim();
+    const location = document.getElementById('shopLocation').value.trim();
+    const phone = document.getElementById('shopPhone').value.trim();
+    const description = document.getElementById('shopDescription').value.trim();
+    const msg = document.getElementById('shopMsg');
+
+    if (!name) {
+      msg.className = 'msg error';
+      msg.textContent = 'Shop name is required.';
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from('shops')
+      .insert({
+        owner_id: currentUser.id,
+        name,
+        location,
+        phone,
+        description
+      })
+      .select()
+      .single();
+
+    if (error) {
+      msg.className = 'msg error';
+      msg.textContent = error.message;
+      return;
+    }
+
+    myShop = data;
+    document.getElementById('createShopSection').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    document.getElementById('productsSection').classList.remove('hidden');
+    document.getElementById('shopTitle').textContent = data.name;
+    document.getElementById('shopInfo').textContent = 
+      (data.location || '') + (data.phone ? ' • ' + data.phone : '');
+  }
+
+  function showAddProduct() {
+    document.getElementById('addProductSection').classList.remove('hidden');
+  }
+
+  function hideAddProduct() {
+    document.getElementById('addProductSection').classList.add('hidden');
+  }
+
+  async function addProduct() {
+    const name = document.getElementById('prodName').value.trim();
+    const price = Number(document.getElementById('prodPrice').value);
+    const category = document.getElementById('prodCategory').value;
+    const description = document.getElementById('prodDescription').value.trim();
+    const image_url = document.getElementById('prodImage').value.trim();
+    const msg = document.getElementById('productMsg');
+
+    if (!name || !price || price < 0) {
+      msg.className = 'msg error';
+      msg.textContent = 'Name and valid price are required.';
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from('products')
+      .insert({
+        shop_id: myShop.id,
+        name,
+        price,
+        category,
+        description,
+        image_url: image_url || null
+      });
+
+    if (error) {
+      msg.className = 'msg error';
+      msg.textContent = error.message;
+      return;
+    }
+
+    msg.className = 'msg success';
+    msg.textContent = 'Product added successfully!';
+    document.getElementById('prodName').value = '';
+    document.getElementById('prodPrice').value = '';
+    document.getElementById('prodDescription').value = '';
+    document.getElementById('prodImage').value = '';
+    loadMyProducts();
+  }
+
+  async function loadMyProducts() {
+    if (!myShop) return;
+
+    const { data, error } = await supabaseClient
+      .from('products')
+      .select('*')
+      .eq('shop_id', myShop.id)
+      .order('created_at', { ascending: false });
+
+    const list = document.getElementById('productList');
+    if (error || !data || data.length === 0) {
+      list.innerHTML = '<p>No products yet. Click “+ Add Product” to start.</p>';
+      return;
+    }
+
+    list.innerHTML = data.map(p => `
+      <div class="product-item">
+        <div>
+          <strong>${p.name}</strong>
+          <span>UGX ${Number(p.price).toLocaleString()} • ${p.category || 'Other'}</span>
+        </div>
+        <button class="danger" onclick="deleteProduct('${p.id}')">Delete</button>
+      </div>
+    `).join('');
+  }
+
+  async function deleteProduct(id) {
+    if (!confirm('Delete this product?')) return;
+    await supabaseClient.from('products').delete().eq('id', id);
+    loadMyProducts();
+  }
+
+  init();
+</script>
+</body>
+</html>
