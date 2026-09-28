@@ -20,7 +20,12 @@ async function loadProducts() {
     name: p.name,
     cat: p.category || "Other",
     price: Number(p.price),
-    icon: p.image_url ? "🛍️" : "📦"
+        id: p.id,
+    name: p.name,
+    cat: p.category || "Other",
+    price: Number(p.price),
+    icon: p.image_url ? "🛍️" : "📦",
+    image: p.image_url || ""
   }));
 
   if (error) {
@@ -36,7 +41,7 @@ function render() {
   document.querySelector("#resultText").textContent = rows.length + " products";
   document.querySelector("#products").innerHTML = rows.map(x =>
     `<article class="product">
-      <div class="pic">${x.icon}</div>
+      <div class="pic">${x.image ? `<img src="${x.image}" alt="${x.name}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : x.icon}</div>
       <div class="info">
         <small>${x.cat}</small>
         <h3>${x.name}</h3>
