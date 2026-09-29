@@ -55,9 +55,21 @@ function render() {
 function add(id) {
   const item = data.find(x => x.id === id);
   if (!item) return;
-  cart.push(item);
-  document.querySelector("#cartCount").textContent = cart.length;
-  showCart();
+  const existing = cart.find(x => x.id === id);
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({ ...item, qty: 1 });
+  }
+  document.querySelector("#cartCount").textContent = cart.reduce((s, x) => s + x.qty, 0);
+ function showCart() {
+  document.querySelector("#drawer").classList.add("open");
+  document.querySelector("#overlay").classList.add("show");
+  document.querySelector("#cartItems").innerHTML = cart.length
+    ? cart.map(x => `<div class="cart-row"><span>${x.icon} ${x.name} x${x.qty || 1}</span><b>${fmt(x.price * (x.qty || 1))}</b></div>`).join("")
+    : "<p>Your cart is empty.</p>";
+  document.querySelector("#total").textContent = fmt(cart.reduce((s, x) => s + x.price * (x.qty || 1), 0));
+}
 }
 function showCart() {
   document.querySelector("#drawer").classList.add("open");
@@ -120,7 +132,7 @@ async function checkout() {
   if (!cart.length) {
     alert("Your cart is empty.");
     return;
-  }
+  const total = cart.reduce((s, x) => s + x.price * (x.qty || 1), 0);
   if (!currentUser) {
     alert("Please log in first.");
     window.location.href = "account.html";
@@ -157,7 +169,7 @@ async function checkout() {
     product_id: x.id,
     product_name: x.name,
     price: x.price,
-    quantity: 1
+    quantity: x.qty || 1
   }));
 
   const { error: itemError } = await supabaseClient
