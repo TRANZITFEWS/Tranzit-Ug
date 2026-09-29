@@ -321,6 +321,7 @@
             <span>${o.buyer_phone || ''} • ${o.buyer_location || ''}</span>
             <span>${items || 'No items listed'}</span>
             <span>UGX ${Number(o.total).toLocaleString()} • ${o.status}</span>
+                        <button onclick="markComplete('${o.id}')">Mark completed</button>
           </div>
         </div>
       `;
