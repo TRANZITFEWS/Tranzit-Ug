@@ -76,15 +76,13 @@ function showCart() {
 }
 
 function closeDrawer() {
-function showCart() {
-  document.querySelector("#drawer").classList.add("open");
-  document.querySelector("#overlay").classList.add("show");
-  document.querySelector("#cartItems").innerHTML = cart.length
-    ? cart.map(x => `<div class="cart-row"><span>${x.icon} ${x.name}</span><b>${fmt(x.price)}</b></div>`).join("")
-    : "<p>Your cart is empty.</p>";
-  document.querySelector("#total").textContent = fmt(cart.reduce((s, x) => s + x.price, 0));
+  document.querySelector("#drawer").classList.remove("open");
+  document.querySelector("#overlay").classList.remove("show");
 }
 
+document.querySelector("#cartBtn").onclick = showCart;
+
+async function checkAuth() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   currentUser = user;
   updateAccountButton();
@@ -128,7 +126,7 @@ async function checkout() {
   if (!cart.length) {
     alert("Your cart is empty.");
     return;
-  const total = cart.reduce((s, x) => s + x.price * (x.qty || 1), 0);
+  }
   if (!currentUser) {
     alert("Please log in first.");
     window.location.href = "account.html";
