@@ -327,6 +327,18 @@
       `;
     }).join('');
   }
+    async function markComplete(id) {
+    const { error } = await supabaseClient
+      .from('orders')
+      .update({ status: 'completed' })
+      .eq('id', id);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    loadOrders();
+  }
   init();
 </script>
 </body>
