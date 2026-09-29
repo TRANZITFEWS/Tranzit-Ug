@@ -62,7 +62,20 @@ function add(id) {
     cart.push({ ...item, qty: 1 });
   }
   document.querySelector("#cartCount").textContent = cart.reduce((s, x) => s + x.qty, 0);
- function showCart() {
+function add(id) {
+  const item = data.find(x => x.id === id);
+  if (!item) return;
+  const existing = cart.find(x => x.id === id);
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({ ...item, qty: 1 });
+  }
+  document.querySelector("#cartCount").textContent = cart.reduce((s, x) => s + x.qty, 0);
+  showCart();
+}
+
+function showCart() {
   document.querySelector("#drawer").classList.add("open");
   document.querySelector("#overlay").classList.add("show");
   document.querySelector("#cartItems").innerHTML = cart.length
@@ -70,7 +83,8 @@ function add(id) {
     : "<p>Your cart is empty.</p>";
   document.querySelector("#total").textContent = fmt(cart.reduce((s, x) => s + x.price * (x.qty || 1), 0));
 }
-}
+
+function closeDrawer() {
 function showCart() {
   document.querySelector("#drawer").classList.add("open");
   document.querySelector("#overlay").classList.add("show");
