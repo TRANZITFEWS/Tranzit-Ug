@@ -52,16 +52,7 @@ function render() {
   ).join("") || "<p>No products found.</p>";
 }
 
-function add(id) {
-  const item = data.find(x => x.id === id);
-  if (!item) return;
-  const existing = cart.find(x => x.id === id);
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({ ...item, qty: 1 });
-  }
-  document.querySelector("#cartCount").textContent = cart.reduce((s, x) => s + x.qty, 0);
+
 function add(id) {
   const item = data.find(x => x.id === id);
   if (!item) return;
@@ -94,15 +85,6 @@ function showCart() {
   document.querySelector("#total").textContent = fmt(cart.reduce((s, x) => s + x.price, 0));
 }
 
-function closeDrawer() {
-  document.querySelector("#drawer").classList.remove("open");
-  document.querySelector("#overlay").classList.remove("show");
-}
-
-document.querySelector("#cartBtn").onclick = showCart;
-
-// ===== AUTH =====
-async function checkAuth() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   currentUser = user;
   updateAccountButton();
@@ -158,7 +140,7 @@ async function checkout() {
   const location = prompt("Delivery location:");
   if (!location) return;
 
-  const total = cart.reduce((s, x) => s + x.price, 0);
+  const total = cart.reduce((s, x) => s + x.price * (x.qty || 1), 0);
 
   const { data: order, error } = await supabaseClient
     .from("orders")
