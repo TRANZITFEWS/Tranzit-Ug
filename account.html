@@ -48,6 +48,8 @@
       <h1>My Account</h1>
       <p id="welcomeText"></p>
       <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            <h2>My Orders</h2>
+      <div id="myOrders"></div>
       <button onclick="logoutUser()" style="background:#c0392b;">Log Out</button>
       <a class="back" href="index.html">← Back to marketplace</a>
     </div>
@@ -76,6 +78,7 @@
     document.getElementById('backLink').style.display = 'none';
     document.getElementById('welcomeText').textContent = 'You are logged in.';
     document.getElementById('userEmail').textContent = user.email;
+        loadMyOrders(user.id);
   }
 
   async function loginUser() {
@@ -132,7 +135,33 @@
     await supabaseClient.auth.signOut();
     window.location.reload();
   }
+  async function loadMyOrders(userId) {
+    const box = document.getElementById('myOrders');
+    if (!box) return;
 
+    const { data, error } = await supabaseClient
+      .from('orders')
+      .select('*, order_items(*)')
+      .eq('buyer_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      box.innerHTML = '<p>' + error.message + '</p>';
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      box.innerHTML = '<p>No orders yet.</p>';
+      return;
+    }
+
+    box.innerHTML = data.map(o => {
+      const items = (o.order_items || [])
+        .map(i => i.product_name + ' x' + i.quantity)
+        .join(', ');
+      return `<p><b>${items}</b><br>UGX ${Number(o.total).toLocaleString()} • ${o.status}<br>${o.buyer_location || ''}</p>`;
+    }).join('');
+  }
   checkUser();
 </script>
 </body>
