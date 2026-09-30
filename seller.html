@@ -352,13 +352,15 @@
         .map(i => i.product_name + ' x' + i.quantity)
         .join(', ');
       return `
-        <div class="product-item">
+        <div class="product-item" style="align-items:flex-start;">
           <div>
             <strong>${o.buyer_name || 'Customer'}</strong>
-            <span>${o.buyer_phone || ''} • ${o.buyer_location || ''}</span>
-            <span>${items || 'No items listed'}</span>
-            <span>UGX ${Number(o.total).toLocaleString()} • ${o.status}</span>
-                                 ${o.status === 'completed' ? '' : `<button onclick="markComplete('${o.id}')">Mark completed</button>`}
+            <span>Phone: ${o.buyer_phone || '-'}</span>
+            <span>Location: ${o.buyer_location || '-'}</span>
+            <span>Items: ${items || 'No items listed'}</span>
+            <span>Total: UGX ${Number(o.total).toLocaleString()}</span>
+            <span>Status: ${o.status}</span>
+            ${o.status === 'completed' ? '' : `<button onclick="markComplete('${o.id}')">Mark completed</button>`}
           </div>
         </div>
       `;
