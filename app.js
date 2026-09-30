@@ -133,14 +133,46 @@ async function checkout() {
     return;
   }
 
-  const phone = prompt("Phone number for delivery:");
+  const phone = prompt("DELIVERY PHONE (example 0751234567):");
   if (!phone) return;
-  const location = prompt("Delivery location:");
+
+  const location = prompt("DELIVERY LOCATION (place name, not a phone number):");
   if (!location) return;
-  const method = prompt("Pay with: MTN or Airtel?");
+  if (/\d{7,}/.test(location)) {
+    alert("Location looks like a phone number. Please enter a place, e.g. Ndejje Zanta.");
+    return;
+  }
+
+  const method = prompt("Pay with MTN or Airtel? Type MTN or Airtel:");
   if (!method) return;
-  const momo = prompt("Mobile Money number:");
+  const network = method.trim().toUpperCase();
+  if (network !== "MTN" && network !== "AIRTEL") {
+    alert("Please type MTN or Airtel.");
+    return;
+  }
+
+  const momo = prompt("YOUR " + network + " NUMBER (the number you will pay from):");
   if (!momo) return;
+
+  const digits = momo.replace(/\D/g, "");
+  let local = digits;
+  if (local.startsWith("256") && local.length === 12) local = "0" + local.slice(3);
+  if (!/^0\d{9}$/.test(local)) {
+    alert("Enter a valid Ugandan number, e.g. 0751234567");
+    return;
+  }
+
+  const prefix = local.slice(0, 3);
+  const mtn = ["076", "077", "078", "079"];
+  const airtel = ["075", "070", "074"];
+  if (network === "MTN" && !mtn.includes(prefix)) {
+      alert("That number is not MTN. Use 077, 078 or 076.");
+    return;
+  }
+  if (network === "AIRTEL" && !airtel.includes(prefix)) {
+    alert("That number is not Airtel. Use 075, 070 or 074.");
+    return;
+  }
   const total = cart.reduce((s, x) => s + x.price * (x.qty || 1), 0);
 
   const { data: order, error } = await supabaseClient
@@ -152,8 +184,8 @@ async function checkout() {
       buyer_location: location,
       total: total,
       status: "pending",
-            payment_method: method,
-      payment_phone: momo,
+       payment_method: network,
+      payment_phone: local,
       payment_status: "unpaid"
     })
     .select()
