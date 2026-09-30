@@ -137,7 +137,10 @@ async function checkout() {
   if (!phone) return;
   const location = prompt("Delivery location:");
   if (!location) return;
-
+  const method = prompt("Pay with: MTN or Airtel?");
+  if (!method) return;
+  const momo = prompt("Mobile Money number:");
+  if (!momo) return;
   const total = cart.reduce((s, x) => s + x.price * (x.qty || 1), 0);
 
   const { data: order, error } = await supabaseClient
@@ -148,7 +151,10 @@ async function checkout() {
       buyer_phone: phone,
       buyer_location: location,
       total: total,
-      status: "pending"
+      status: "pending",
+            payment_method: method,
+      payment_phone: momo,
+      payment_status: "unpaid"
     })
     .select()
     .single();
@@ -178,7 +184,7 @@ async function checkout() {
   cart = [];
   document.querySelector("#cartCount").textContent = 0;
   closeDrawer();
-  alert("Order placed! We will contact you on " + phone);
+ alert("Order placed! Send UGX " + total.toLocaleString() + " by " + method + " to the seller. We will confirm on " + momo);
 }
 // Start
 loadProducts();
