@@ -360,6 +360,8 @@
             <span>Items: ${items || 'No items listed'}</span>
             <span>Total: UGX ${Number(o.total).toLocaleString()}</span>
             <span>Status: ${o.status}</span>
+                        <span>Pay: ${o.payment_method || '-'} ${o.payment_phone || ''}</span>
+            <span>Payment: ${o.payment_status || 'unpaid'}</span>
             ${o.status === 'completed' ? '' : `<button onclick="markComplete('${o.id}')">Mark completed</button>`}
           </div>
         </div>
