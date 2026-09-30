@@ -135,7 +135,15 @@ async function checkout() {
 
   const phone = prompt("DELIVERY PHONE (example 0751234567):");
   if (!phone) return;
-
+  const phoneDigits = phone.replace(/\D/g, "");
+  let deliveryPhone = phoneDigits;
+  if (deliveryPhone.startsWith("256") && deliveryPhone.length === 12) {
+    deliveryPhone = "0" + deliveryPhone.slice(3);
+  }
+  if (!/^0\d{9}$/.test(deliveryPhone)) {
+    alert("Delivery phone must be a number, e.g. 0751234567");
+    return;
+  }
   const location = prompt("DELIVERY LOCATION (place name, not a phone number):");
   if (!location) return;
   if (/\d{7,}/.test(location)) {
@@ -180,7 +188,7 @@ async function checkout() {
     .insert({
       buyer_id: currentUser.id,
       buyer_name: currentUser.email,
-      buyer_phone: phone,
+      buyer_phone: deliveryPhone,
       buyer_location: location,
       total: total,
       status: "pending",
