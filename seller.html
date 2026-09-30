@@ -74,6 +74,7 @@
     <h2>Add New Product</h2>
     <div id="productMsg" class="msg"></div>
     <input id="prodName" type="text" placeholder="Product name *" required>
+        <input id="editingId" type="hidden">
     <input id="prodPrice" type="number" placeholder="Price in UGX *" min="0" required>
     <select id="prodCategory">
       <option value="Electronics">Electronics</option>
@@ -233,16 +234,30 @@
       image_url = pub.publicUrl;
     }
 
-    const { error } = await supabaseClient
-      .from('products')
-      .insert({
-        shop_id: myShop.id,
-        name,
-        price,
-        category,
-        description,
-        image_url
-      });
+    const editingId = document.getElementById('editingId').value;
+    let error;
+
+    if (editingId) {
+      const updateData = { name, price, category, description };
+      if (image_url) updateData.image_url = image_url;
+      const res = await supabaseClient
+        .from('products')
+        .update(updateData)
+        .eq('id', editingId);
+      error = res.error;
+    } else {
+      const res = await supabaseClient
+        .from('products')
+        .insert({
+          shop_id: myShop.id,
+          name,
+          price,
+          category,
+          description,
+          image_url
+        });
+      error = res.error;
+    }
 
     if (error) {
       msg.className = 'msg error';
@@ -250,7 +265,8 @@
       return;
     }
 
-    msg.className = 'msg success';
+    msg.textContent = editingId ? 'Product updated!' : 'Product added successfully!';
+    document.getElementById('editingId').value = '';
     msg.textContent = 'Product added successfully!';
     document.getElementById('prodName').value = '';
     document.getElementById('prodPrice').value = '';
@@ -280,11 +296,32 @@
           <strong>${p.name}</strong>
           <span>UGX ${Number(p.price).toLocaleString()} • ${p.category || 'Other'}</span>
         </div>
-        <button class="danger" onclick="deleteProduct('${p.id}')">Delete</button>
-      </div>
+         <div>
+          <button onclick="editProduct('${p.id}')">Edit</button>
+          <button class="danger" onclick="deleteProduct('${p.id}')">Delete</button>
+        </div>
     `).join('');
   }
+  async function editProduct(id) {
+    const { data, error } = await supabaseClient
+      .from('products')
+      .select('*')
+      .eq('id', id)
+      .single();
 
+    if (error || !data) {
+      alert(error ? error.message : 'Product not found');
+      return;
+    }
+
+    document.getElementById('editingId').value = data.id;
+    document.getElementById('prodName').value = data.name || '';
+    document.getElementById('prodPrice').value = data.price || '';
+    document.getElementById('prodCategory').value = data.category || 'Other';
+    document.getElementById('prodDescription').value = data.description || '';
+    document.getElementById('addProductSection').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
   async function deleteProduct(id) {
     if (!confirm('Delete this product?')) return;
     await supabaseClient.from('products').delete().eq('id', id);
