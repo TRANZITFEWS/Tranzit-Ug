@@ -24,6 +24,9 @@ async function loadProducts() {
     name: p.name,
     cat: p.category || "Other",
     price: Number(p.price),
+        price: Number(p.price),
+    stock: Number(p.stock ?? 0),
+    icon: p.image_url ? "🛍️" : "📦",
     icon: p.image_url ? "🛍️" : "📦",
     image: p.image_url || ""
   }));
@@ -51,17 +54,22 @@ function render() {
     </article>`
   ).join("") || "<p>No products found.</p>";
 }
-
-
 function add(id) {
   const item = data.find(x => x.id === id);
   if (!item) return;
-  const existing = cart.find(x => x.id === id);
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({ ...item, qty: 1 });
+  const left = Number(item.stock ?? 0);
+  if (left < 1) {
+    alert("Out of stock");
+    return;
   }
+  const existing = cart.find(x => x.id === id);
+  const nextQty = existing ? existing.qty + 1 : 1;
+  if (nextQty > left) {
+    alert("Only " + left + " left");
+    return;
+  }
+  if (existing) existing.qty = nextQty;
+  else cart.push({ ...item, qty: 1 });
   document.querySelector("#cartCount").textContent = cart.reduce((s, x) => s + x.qty, 0);
   showCart();
 }
