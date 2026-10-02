@@ -83,6 +83,7 @@
     <input id="prodName" type="text" placeholder="Product name *" required>
         <input id="editingId" type="hidden">
     <input id="prodPrice" type="number" placeholder="Price in UGX *" min="0" required>
+        <input id="prodStock" type="number" placeholder="Stock quantity *" min="0" value="1">
     <select id="prodCategory">
       <option value="Electronics">Electronics</option>
       <option value="Fashion">Fashion</option>
@@ -233,6 +234,7 @@
   async function addProduct() {
     const name = document.getElementById('prodName').value.trim();
     const price = Number(document.getElementById('prodPrice').value);
+     const stock = Number(document.getElementById('prodStock').value || 0);   
     const category = document.getElementById('prodCategory').value;
     const description = document.getElementById('prodDescription').value.trim();
     const fileInput = document.getElementById('prodImage');
@@ -268,9 +270,8 @@
 
     const editingId = document.getElementById('editingId').value;
     let error;
-
     if (editingId) {
-      const updateData = { name, price, category, description };
+      const updateData = { name, price, category, description, stock };
       if (image_url) updateData.image_url = image_url;
       const res = await supabaseClient
         .from('products')
@@ -284,6 +285,7 @@
           shop_id: myShop.id,
           name,
           price,
+          stock,          
           category,
           description,
           image_url
