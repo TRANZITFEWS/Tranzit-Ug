@@ -224,7 +224,18 @@ async function checkout() {
   cart = [];
   document.querySelector("#cartCount").textContent = 0;
   closeDrawer();
- alert("Order placed! Send UGX " + total.toLocaleString() + " by " + method + " to the seller. We will confirm on " + momo);
+  const { data: shops } = await supabaseClient
+    .from("shops")
+    .select("name, momo_network, momo_number")
+    .not("momo_number", "is", null)
+    .limit(1);
+
+  const shop = shops && shops[0];
+  const payTo = shop && shop.momo_number
+    ? shop.momo_network + " " + shop.momo_number
+    : "the seller";
+
+  alert("Order placed! Send UGX " + total.toLocaleString() + " to " + payTo + ". Pay from your " + network + " number " + local + ".");
 }
 // Start
 loadProducts();
