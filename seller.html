@@ -62,6 +62,13 @@
   <!-- Dashboard (after shop exists) -->
   <div id="dashboard" class="card hidden">
     <h1 id="shopTitle">My Shop</h1>
+        <select id="momoNetwork">
+      <option value="MTN">MTN</option>
+      <option value="AIRTEL">Airtel</option>
+    </select>
+    <input id="momoNumber" type="text" placeholder="Pay-to number, e.g. 0759870704">
+    <button onclick="saveMomo()">Save pay number</button>
+    <p id="momoMsg"></p>
     <p id="shopInfo"></p>
     <div class="top-actions">
       <button class="secondary" onclick="showAddProduct()">+ Add Product</button>
