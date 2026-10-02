@@ -128,7 +128,30 @@
     currentUser = user;
     await loadShop();
   }
+  async function saveMomo() {
+    const momo_network = document.getElementById('momoNetwork').value;
+    const momo_number = document.getElementById('momoNumber').value.trim();
+    const msg = document.getElementById('momoMsg');
 
+    if (!/^0\d{9}$/.test(momo_number)) {
+      msg.textContent = 'Enter a valid number, e.g. 0759870704';
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from('shops')
+      .update({ momo_network, momo_number })
+      .eq('id', myShop.id);
+
+    if (error) {
+      msg.textContent = error.message;
+      return;
+    }
+
+    myShop.momo_network = momo_network;
+    myShop.momo_number = momo_number;
+    msg.textContent = 'Pay number saved.';
+  }
   async function loadShop() {
     const { data, error } = await supabaseClient
       .from('shops')
@@ -153,6 +176,8 @@
       document.getElementById('shopTitle').textContent = myShop.name;
       document.getElementById('shopInfo').textContent =
         (myShop.location || '') + (myShop.phone ? ' • ' + myShop.phone : '');
+            document.getElementById('momoNetwork').value = myShop.momo_network || 'MTN';
+      document.getElementById('momoNumber').value = myShop.momo_number || '';
       loadMyProducts();
       document.getElementById('ordersSection').classList.remove('hidden');
       loadOrders();
