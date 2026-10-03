@@ -158,6 +158,10 @@ async function checkout() {
     alert("Delivery phone must be a real MTN or Airtel number.");
     return;
   }
+    if (/^(\d)\1+$/.test(deliveryPhone.slice(3))) {
+    alert("That delivery number looks fake.");
+    return;
+  }
   const location = prompt("DELIVERY LOCATION (place name, not a phone number):");
   if (!location) return;
   if (/\d{7,}/.test(location)) {
@@ -194,6 +198,10 @@ async function checkout() {
   const airtel = ["075", "070", "074"];
   if (network === "MTN" && !mtn.includes(prefix)) {
       alert("That number is not MTN. Use 077, 078 or 076.");
+    return;
+  }
+    if (/^(\d)\1+$/.test(local.slice(3))) {
+    alert("That Mobile Money number looks fake.");
     return;
   }
   if (network === "AIRTEL" && !airtel.includes(prefix)) {
