@@ -165,7 +165,8 @@ async function checkout() {
     return;
   }
   const place = location.trim();
-  if (place.length < 3 || /^(.)\1+$/i.test(place.replace(/\s/g, ""))) {
+  const compact = place.replace(/\s/g, "");
+  if (place.length < 3 || !/[aeiou]/i.test(place) || /^(.{1,2})\1+$/i.test(compact)) {
     alert("Enter a real place name, e.g. Ndejje Zanta.");
     return;
   }
