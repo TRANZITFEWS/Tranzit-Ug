@@ -152,6 +152,12 @@ async function checkout() {
     alert("Delivery phone must be a number, e.g. 0751234567");
     return;
   }
+    const deliveryPrefix = deliveryPhone.slice(0, 3);
+  const ugPrefixes = ["070", "074", "075", "076", "077", "078", "079"];
+  if (!ugPrefixes.includes(deliveryPrefix)) {
+    alert("Delivery phone must be a real MTN or Airtel number.");
+    return;
+  }
   const location = prompt("DELIVERY LOCATION (place name, not a phone number):");
   if (!location) return;
   if (/\d{7,}/.test(location)) {
