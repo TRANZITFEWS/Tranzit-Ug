@@ -228,7 +228,12 @@ async function checkout() {
     alert(itemError.message);
     return;
   }
-
+  for (const x of cart) {
+    await supabaseClient.rpc("reduce_stock", {
+      p_id: x.id,
+      qty: x.qty || 1
+    });
+  }
   cart = [];
   document.querySelector("#cartCount").textContent = 0;
   closeDrawer();
