@@ -164,7 +164,11 @@ async function checkout() {
     alert("Location looks like a phone number. Please enter a place, e.g. Ndejje Zanta.");
     return;
   }
-
+  const place = location.trim();
+  if (place.length < 3 || /^(.)\1+$/i.test(place.replace(/\s/g, ""))) {
+    alert("Enter a real place name, e.g. Ndejje Zanta.");
+    return;
+  }
   const method = prompt("Pay with MTN or Airtel? Type MTN or Airtel:");
   if (!method) return;
   const network = method.trim().toUpperCase();
