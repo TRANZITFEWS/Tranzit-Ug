@@ -49,7 +49,10 @@ function render() {
         <small>${x.cat}</small>
         <h3>${x.name}</h3>
         <div class="price">${fmt(x.price)}</div>
-        <button onclick="add('${x.id}')">Add to cart</button>
+        <small>${Number(x.stock) > 0 ? x.stock + " in stock" : "Out of stock"}</small>
+        ${Number(x.stock) > 0
+          ? `<button onclick="add('${x.id}')">Add to cart</button>`
+          : `<button disabled>Out of stock</button>`} onclick="add('${x.id}')">Add to cart</button>
       </div>
     </article>`
   ).join("") || "<p>No products found.</p>";
