@@ -52,7 +52,7 @@ function render() {
         <small>${Number(x.stock) > 0 ? x.stock + " in stock" : "Out of stock"}</small>
         ${Number(x.stock) > 0
           ? `<button onclick="add('${x.id}')">Add to cart</button>`
-          : `<button disabled>Out of stock</button>`} onclick="add('${x.id}')">Add to cart</button>
+          : `<button disabled>Out of stock</button>`} 
       </div>
     </article>`
   ).join("") || "<p>No products found.</p>";
