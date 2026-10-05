@@ -13,13 +13,14 @@ async function loadProducts() {
     .from("products")
     .select("*")
     .eq("is_active", true)
-      const { data: shops } = await supabaseClient
+    .order("created_at", { ascending: false });
+
+  const { data: shops } = await supabaseClient
     .from("shops")
     .select("id, name");
 
   const shopName = {};
   (shops || []).forEach(s => { shopName[s.id] = s.name; });
-    .order("created_at", { ascending: false });
 
   data = (rows || []).map(p => ({
     id: p.id,
