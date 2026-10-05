@@ -13,6 +13,12 @@ async function loadProducts() {
     .from("products")
     .select("*")
     .eq("is_active", true)
+      const { data: shops } = await supabaseClient
+    .from("shops")
+    .select("id, name");
+
+  const shopName = {};
+  (shops || []).forEach(s => { shopName[s.id] = s.name; });
     .order("created_at", { ascending: false });
 
   data = (rows || []).map(p => ({
@@ -20,12 +26,14 @@ async function loadProducts() {
     name: p.name,
     cat: p.category || "Other",
     price: Number(p.price),
+        shop: shopName[p.shop_id] || "Shop",
         id: p.id,
     name: p.name,
     cat: p.category || "Other",
     price: Number(p.price),
         price: Number(p.price),
     stock: Number(p.stock ?? 0),
+        shop: shopName[p.shop_id] || "Shop",
     icon: p.image_url ? "🛍️" : "📦",
     icon: p.image_url ? "🛍️" : "📦",
     image: p.image_url || ""
@@ -39,7 +47,8 @@ async function loadProducts() {
 
 function render() {
   const searchBox = document.querySelector("#search");
-  let q = searchBox ? searchBox.value.toLowerCase() : "";
+  let q = searchBox ? 
+    searchBox.value.toLowerCase() : "";
   let rows = data.filter(x => (cat === "All" || x.cat === cat) && x.name.toLowerCase().includes(q));
   document.querySelector("#resultText").textContent = rows.length + " products";
   document.querySelector("#products").innerHTML = rows.map(x =>
@@ -47,6 +56,7 @@ function render() {
       <div class="pic">${x.image ? `<img src="${x.image}" alt="${x.name}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : x.icon}</div>
       <div class="info">
         <small>${x.cat}</small>
+        <small>${x.shop}</small>        
         <h3>${x.name}</h3>
         <div class="price">${fmt(x.price)}</div>
         <small>${Number(x.stock) > 0 ? x.stock + " in stock" : "Out of stock"}</small>
