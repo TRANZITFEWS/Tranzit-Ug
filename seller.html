@@ -367,7 +367,9 @@
 
     const { data, error } = await supabaseClient
       .from('orders')
+
       .select('*, order_items(*)')
+                  .neq('status', 'completed')
       .order('created_at', { ascending: false })
       .limit(20);
 
