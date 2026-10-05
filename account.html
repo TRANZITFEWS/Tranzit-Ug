@@ -159,8 +159,26 @@
       const items = (o.order_items || [])
         .map(i => i.product_name + ' x' + i.quantity)
         .join(', ');
-      return `<p><b>${items}</b><br>UGX ${Number(o.total).toLocaleString()} • ${o.status}<br>${o.buyer_location || ''}</p>`;
+      const claim = o.payment_status === 'paid'
+        ? 'Paid'
+        : o.buyer_paid
+          ? 'Waiting for seller to confirm'
+          : `<button onclick="claimPaid('${o.id}')">I have paid</button>`;
+      return `<p><b>${items}</b><br>UGX ${Number(o.total).toLocaleString()} • ${o.status}<br>${o.buyer_location || ''}<br>${claim}</p>`;
     }).join('');
+  }
+    async function claimPaid(id) {
+    const { error } = await supabaseClient
+      .from('orders')
+      .update({ buyer_paid: true })
+      .eq('id', id);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    alert('Payment sent to the seller for confirmation.');
+    const { data } = await supabaseClient.auth.getUser();
+    if (data.user) loadMyOrders(data.user.id);
   }
   checkUser();
 </script>
