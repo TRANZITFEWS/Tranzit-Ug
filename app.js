@@ -55,11 +55,14 @@ function render() {
   document.querySelector("#products").innerHTML = rows.map(x =>
     `<article class="product">
       <div class="pic">${x.image ? `<img src="${x.image}" alt="${x.name}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : x.icon}</div>
-        <small style="display:block">${x.cat}</small>
-        <small style="display:block">${x.shop}</small>
-        <h3>${x.name}</h3>
-        <div class="price">${fmt(x.price)}</div>
-        <small>${Number(x.stock) > 0 ? x.stock + " in stock" : "Out of stock"}</small>
+        <div style="border:1px dashed #1f6b4a;border-radius:10px;padding:10px;background:#f7fbf8">
+          <strong style="display:block;text-align:center">${x.shop}</strong>
+          <small style="display:block;text-align:center">${x.cat}</small>
+          <div style="border-top:1px dashed #1f6b4a;margin:6px 0"></div>
+          <h3>${x.name}</h3>
+          <div class="price">${fmt(x.price)}</div>
+          <small>${Number(x.stock) > 0 ? x.stock + " in stock" : "Out of stock"}</small>
+        </div>
         ${Number(x.stock) > 0
           ? `<button onclick="add('${x.id}')">Add to cart</button>`
           : `<button disabled>Out of stock</button>`} 
