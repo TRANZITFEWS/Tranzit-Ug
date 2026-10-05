@@ -394,6 +394,7 @@
             <span>Items: ${items || 'No items listed'}</span>
             <span>Total: UGX ${Number(o.total).toLocaleString()}</span>
             <span>Status: ${o.status}</span>
+                   <span>${o.buyer_paid ? 'Buyer says paid' : 'Buyer has not confirmed'}</span>
                         <span>Pay: ${o.payment_method || '-'} ${o.payment_phone || ''}</span>
             <span>Payment: ${o.payment_status || 'unpaid'}</span>
             ${o.payment_status === 'paid' ? '' : `<button onclick="markPaid('${o.id}')">Mark paid</button>`}
