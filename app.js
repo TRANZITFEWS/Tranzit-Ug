@@ -55,9 +55,8 @@ function render() {
   document.querySelector("#products").innerHTML = rows.map(x =>
     `<article class="product">
       <div class="pic">${x.image ? `<img src="${x.image}" alt="${x.name}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : x.icon}</div>
-      <div class="info">
-        <small>${x.cat}</small>
-        <small>${x.shop}</small>        
+        <small style="display:block">${x.cat}</small>
+        <small style="display:block">${x.shop}</small>
         <h3>${x.name}</h3>
         <div class="price">${fmt(x.price)}</div>
         <small>${Number(x.stock) > 0 ? x.stock + " in stock" : "Out of stock"}</small>
