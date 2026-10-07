@@ -94,7 +94,7 @@ function showCart() {
   document.querySelector("#drawer").classList.add("open");
   document.querySelector("#overlay").classList.add("show");
   document.querySelector("#cartItems").innerHTML = cart.length
-    ? cart.map(x => `<div class="cart-row"><span>${x.icon} ${x.name} x${x.qty || 1}</span><button onclick="less('${x.id}')">−</button><b>${fmt(x.price * (x.qty || 1))}</b></div>`).join("")
+? cart.map(x => `<div class="cart-row"><span>${x.icon} ${x.name}</span><div class="cart-controls"><button type="button" onclick="less('${x.id}')">−</button><span>x${x.qty || 1}</span><button type="button" onclick="add('${x.id}')">+</button></div><b>${fmt(x.price * (x.qty || 1))}</b></div>`).join("")
     : "<p>Your cart is empty.</p>";
   document.querySelector("#total").textContent = fmt(cart.reduce((s, x) => s + x.price * (x.qty || 1), 0));
 }
