@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | Tranzit.ug</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .checkout-page {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .checkout-box {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .checkout-box h2 {
+      margin-top: 0;
+    }
+
+    .checkout-box label {
+      display: block;
+      font-weight: 600;
+      margin: 15px 0 6px;
+    }
+
+    .checkout-box input,
+    .checkout-box select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    .checkout-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .place-order-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+      background: #08783f;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #08783f;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="checkout-page">
+
+    <a class="back-link" href="index.html">← Back to shopping</a>
+
+    <h1>Checkout</h1>
+
+    <section class="checkout-box">
+      <h2>Delivery details</h2>
+
+      <label for="phone">Delivery phone</label>
+      <input
+        id="phone"
+        type="tel"
+        placeholder="e.g. 0751234567"
+      >
+
+      <label for="location">Delivery location</label>
+      <input
+        id="location"
+        type="text"
+        placeholder="e.g. Ndejjje Zanta"
+      >
+    </section>
+
+    <section class="checkout-box">
+      <h2>Payment method</h2>
+
+      <label for="network">Mobile Money network</label>
+      <select id="network">
+        <option value="">Select network</option>
+        <option value="MTN">MTN Mobile Money</option>
+        <option value="AIRTEL">Airtel Money</option>
+      </select>
+
+      <label for="paymentPhone">Mobile Money number</label>
+      <input
+        id="paymentPhone"
+        type="tel"
+        placeholder="Number you will pay from"
+      >
+    </section>
+
+    <section class="checkout-box">
+      <h2>Order summary</h2>
+
+      <div id="orderItems"></div>
+
+      <div class="checkout-total">
+        <span>Total</span>
+        <span id="checkoutTotal">UGX 0</span>
+      </div>
+
+      <button
+        class="place-order-btn"
+        type="button"
+        id="placeOrderBtn"
+      >
+        Place order
+      </button>
+    </section>
+
+  </main>
+
+  <script>
+    const cart = JSON.parse(
+      localStorage.getItem("tranzitCart") || "[]"
+    );
+
+    const fmt = n =>
+      "UGX " + Number(n).toLocaleString();
+
+    const orderItems =
+      document.getElementById("orderItems");
+
+    if (!cart.length) {
+      orderItems.innerHTML =
+        "<p>Your cart is empty.</p>";
+    } else {
+      orderItems.innerHTML = cart.map(item => `
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          gap:20px;
+          padding:12px 0;
+          border-bottom:1px solid #eee;
+        ">
+          <span>
+            ${item.name} × ${item.qty || 1}
+          </span>
+
+          <strong>
+            ${fmt(item.price * (item.qty || 1))}
+          </strong>
+        </div>
+      `).join("");
+    }
+
+    const total = cart.reduce(
+      (sum, item) =>
+        sum + item.price * (item.qty || 1),
+      0
+    );
+
+    document.getElementById(
+      "checkoutTotal"
+    ).textContent = fmt(total);
+  </script>
+
+</body>
+</html>
