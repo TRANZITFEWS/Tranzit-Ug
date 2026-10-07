@@ -54,14 +54,14 @@ async function loadProduct() {
   container.innerHTML = `
     <article class="product-detail">
       ${product.image_url
-        ? `<img src="${product.image_url}" alt="${product.name}">`
+        ? `<img src="${product.image_url}" alt="${product.name}" style="width:100%;max-height:320px;object-fit:cover;border-radius:16px;">`
         : ''}
       <small>${product.category || 'Other'}</small>
       <h1>${product.name}</h1>
       <h2>UGX ${Number(product.price).toLocaleString()}</h2>
       <p>${product.description || 'No description available.'}</p>
       <p>${product.stock ?? 0} in stock</p>
-      <button>Add to cart</button>
+      <button style="width:100%;padding:14px;border:0;border-radius:12px;background:#173f2a;color:#fff;font-weight:800">Add to cart</button>
     </article>
   `;
 }
