@@ -61,11 +61,23 @@ async function loadProduct() {
       <h2>UGX ${Number(product.price).toLocaleString()}</h2>
       <p>${product.description || 'No description available.'}</p>
       <p>${product.stock ?? 0} in stock</p>
-      <button style="width:100%;padding:14px;border:0;border-radius:12px;background:#173f2a;color:#fff;font-weight:800">Add to cart</button>
+       <button onclick="addFromPage()" style="width:100%;padding:14px;border:0;border-radius:12px;background:#173f2a;color:#fff;font-weight:800">Add to cart</button>
     </article>
   `;
 }
-
+function addFromPage() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const name = document.querySelector('h1').textContent;
+  const price = Number(document.querySelector('h2').textContent.replace(/\D/g, ''));
+  const saved = JSON.parse(localStorage.getItem('tranzitCart') || '[]');
+  const existing = saved.find(x => x.id === id);
+  if (existing) existing.qty += 1;
+  else saved.push({ id, name, price, icon: '🛒', qty: 1 });
+  localStorage.setItem('tranzitCart', JSON.stringify(saved));
+  alert('Added to cart');
+  location.href = 'index.html';
+}
 loadProduct();
 </script>
 
