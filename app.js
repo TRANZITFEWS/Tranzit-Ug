@@ -296,3 +296,4 @@ async function checkout() {
 // Start
 loadProducts();
 checkAuth();
+document.querySelector("#cartCount").textContent = cart.reduce((s, x) => s + (x.qty || 1), 0);
