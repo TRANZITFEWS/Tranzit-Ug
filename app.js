@@ -278,6 +278,7 @@ async function checkout() {
     });
   }
   cart = [];
+  localStorage.setItem("tranzitCart", JSON.stringify(cart));
   document.querySelector("#cartCount").textContent = 0;
   closeDrawer();
   const { data: shops } = await supabaseClient
