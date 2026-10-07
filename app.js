@@ -5,7 +5,7 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 
 let data = [];
-let cat = "All", cart = [];
+let cat = "All", cart = JSON.parse(localStorage.getItem('tranzitCart') || '[]');
 const fmt = n => "UGX " + Number(n).toLocaleString();
 
 async function loadProducts() {
