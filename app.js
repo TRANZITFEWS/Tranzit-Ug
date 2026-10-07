@@ -53,7 +53,7 @@ function render() {
   let rows = data.filter(x => (cat === "All" || x.cat === cat) && x.name.toLowerCase().includes(q));
   document.querySelector("#resultText").textContent = rows.length + " products";
   document.querySelector("#products").innerHTML = rows.map(x =>
-     `<article class="product" onclick="window.location.href='product.html?id=${x.id}'" style="cursor:pointer;"><article class="product" onclick="window.location.href='product.html?id=${x.id}'" style="cursor:pointer;">
+     `<article class="product" onclick="window.location.href='product.html?id=${x.id}'" style="cursor:pointer;">onclick="window.location.href='product.html?id=${x.id}'" style="cursor:pointer;">
       <div class="pic" onclick="location.href='product.html?id=${x.id}'">${x.image ? `<img src="${x.image}" alt="${x.name}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : x.icon}</div>
         <div style="border:1px dashed #1f6b4a;border-radius:10px;padding:10px;background:#f7fbf8">
           <strong style="display:block;text-align:center">${x.shop}</strong>
