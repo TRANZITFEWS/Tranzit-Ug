@@ -155,6 +155,8 @@ if (menuBtn && menuPanel) {
   });
 }
 async function checkout() {
+  window.location.href = "checkout.html";
+return;
   if (!cart.length) {
     alert("Your cart is empty.");
     return;
