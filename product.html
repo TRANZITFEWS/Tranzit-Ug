@@ -47,7 +47,7 @@ async function loadProduct() {
     .single();
 
   if (error || !product) {
-    container.innerHTML = '<p>Product not found.</p>';
+    container.innerHTML = '<p>Product not found.<br>' + (error ? error.message : 'No id') + '</p>';
     return;
   }
 
