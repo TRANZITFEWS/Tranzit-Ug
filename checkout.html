@@ -180,8 +180,27 @@
     document.getElementById(
       "checkoutTotal"
     ).textContent = fmt(total);
-    document.getElementById("placeOrderBtn").onclick = function () {
-  alert("Place order button is working!");
+document.getElementById("placeOrderBtn").onclick = function () {
+  const phone = document.getElementById("deliveryPhone").value.trim();
+  const location = document.getElementById("deliveryLocation").value.trim();
+  const network = document.getElementById("paymentNetwork").value;
+  const momo = document.getElementById("paymentNumber").value.trim();
+
+  if (!phone || !location || !network || !momo) {
+    alert("Please complete all delivery and payment details.");
+    return;
+  }
+
+  localStorage.setItem("tranzitCheckout", JSON.stringify({
+    phone,
+    location,
+    network,
+    momo,
+    cart,
+    total
+  }));
+
+  window.location.href = "account.html";
 };
   </script>
 
