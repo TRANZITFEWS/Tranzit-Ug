@@ -94,11 +94,19 @@ function showCart() {
   document.querySelector("#drawer").classList.add("open");
   document.querySelector("#overlay").classList.add("show");
   document.querySelector("#cartItems").innerHTML = cart.length
-    ? cart.map(x => `<div class="cart-row"><span>${x.icon} ${x.name} x${x.qty || 1}</span><b>${fmt(x.price * (x.qty || 1))}</b></div>`).join("")
+    ? cart.map(x => `<div class="cart-row"><span>${x.icon} ${x.name} x${x.qty || 1}</span><button onclick="less('${x.id}')">−</button><b>${fmt(x.price * (x.qty || 1))}</b></div>`).join("")
     : "<p>Your cart is empty.</p>";
   document.querySelector("#total").textContent = fmt(cart.reduce((s, x) => s + x.price * (x.qty || 1), 0));
 }
-
+function less(id) {
+  const item = cart.find(x => x.id === id);
+  if (!item) return;
+  item.qty -= 1;
+  if (item.qty < 1) cart = cart.filter(x => x.id !== id);
+  localStorage.setItem('tranzitCart', JSON.stringify(cart));
+  document.querySelector("#cartCount").textContent = cart.reduce((s, x) => s + (x.qty || 1), 0);
+  showCart();
+}
 function closeDrawer() {
   document.querySelector("#drawer").classList.remove("open");
   document.querySelector("#overlay").classList.remove("show");
