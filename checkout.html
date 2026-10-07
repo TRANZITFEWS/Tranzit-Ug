@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Checkout | Tranzit.ug</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     .checkout-page {
@@ -138,6 +139,9 @@ id="paymentNumber"
   </main>
 
   <script>
+  const SUPABASE_URL = "https://mvqzrkaxuthhkicc1faf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_8iaoevUboXIPBkja1GvozA_SCI5-m8f";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const cart = JSON.parse(
       localStorage.getItem("tranzitCart") || "[]"
     );
@@ -180,7 +184,7 @@ id="paymentNumber"
     document.getElementById(
       "checkoutTotal"
     ).textContent = fmt(total);
-document.getElementById("placeOrderBtn").onclick = function () {
+document.getElementById("placeOrderBtn").onclick = async function () {
   const phone = document.getElementById("deliveryPhone").value.trim();
   const location = document.getElementById("deliveryLocation").value.trim();
   const network = document.getElementById("paymentNetwork").value;
@@ -191,14 +195,37 @@ document.getElementById("placeOrderBtn").onclick = function () {
     return;
   }
 
-  localStorage.setItem("tranzitCheckout", JSON.stringify({
-    phone,
-    location,
-    network,
-    momo,
-    cart,
-    total
-  }));
+const { data: { user } } = await supabaseClient.auth.getUser();
+
+if (!user) {
+  alert("Please log in before placing your order.");
+  window.location.href = "account.html";
+  return;
+}
+
+const orderItems = cart.map(item => ({
+  product_name: item.name,
+  quantity: item.qty || 1,
+  price: item.price
+}));
+
+const { error: orderError } = await supabaseClient
+  .from("orders")
+  .insert({
+    buyer_id: user.id,
+    buyer_location: location,
+    total: total,
+    status: "pending",
+    payment_status: "pending",
+    buyer_paid: false,
+    order_items: orderItems
+  });
+
+if (orderError) {
+  alert("Order could not be created: " + orderError.message);
+  return;
+} 
+localStorage.removeItem("tranzitCart");
 
   window.location.href = "account.html";
 };
