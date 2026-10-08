@@ -141,14 +141,7 @@ id="paymentNumber"
   <script>
   const SUPABASE_URL = "https://mvqzrkaxuthhkicclfaf.supabase.co";
 const SUPABASE_KEY = "sb_publishable_8iaoevUboXIPBkja1GvozA_SCI5-m8f";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-    storage: window.localStorage
-  }
-});
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const cart = JSON.parse(
       localStorage.getItem("tranzitCart") || "[]"
     );
