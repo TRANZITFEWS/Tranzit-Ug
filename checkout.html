@@ -204,28 +204,44 @@ if (!user) {
   return;
 }
 
-const orderItems = cart.map(item => ({
-  product_name: item.name,
-  quantity: item.qty || 1,
-  price: item.price
-}));
-
-const { error: orderError } = await supabaseClient
+const { data: order, error: orderError } = await supabaseClient
   .from("orders")
   .insert({
     buyer_id: user.id,
+    buyer_name: user.email,
+    buyer_phone: phone,
     buyer_location: location,
     total: total,
     status: "pending",
-    payment_status: "pending",
-    buyer_paid: false,
-    order_items: orderItems
-  });
+    payment_method: network,
+    payment_phone: momo,
+    payment_status: "unpaid",
+    buyer_paid: false
+  })
+  .select()
+  .single();
 
 if (orderError) {
   alert("Order could not be created: " + orderError.message);
   return;
-} 
+}
+
+const items = cart.map(item => ({
+  order_id: order.id,
+  product_id: item.id,
+  product_name: item.name,
+  price: item.price,
+  quantity: item.qty || 1
+}));
+
+const { error: itemError } = await supabaseClient
+  .from("order_items")
+  .insert(items);
+
+if (itemError) {
+  alert(itemError.message);
+  return;
+}
 localStorage.removeItem("tranzitCart");
 
   window.location.href = "account.html";
