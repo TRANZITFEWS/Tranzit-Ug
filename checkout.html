@@ -202,7 +202,8 @@ document.getElementById("placeOrderBtn").onclick = async function () {
     return;
   }
 
-const { data: { user } } = await supabaseClient.auth.getUser();
+const { data: { session } } = await supabaseClient.auth.getSession();
+const user = session?.user;
 
 if (!user) {
   alert("Please log in before placing your order.");
