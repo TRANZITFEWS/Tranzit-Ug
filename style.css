@@ -93,3 +93,37 @@
     overflow:hidden;
   }
 }
+/* Marketplace product cards */
+#products .product,
+.product-card {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 0;
+  overflow: hidden;
+  background: white;
+  border-radius: 14px;
+}
+
+.product-card img,
+#products .product img {
+  display: block;
+  width: 100%;
+  height: 190px;
+  object-fit: contain;
+  background: #f8f8f8;
+}
+
+.product-card h3,
+.product-card p,
+.product-card strong,
+#products .product h3,
+#products .product p {
+  position: static;
+  margin: 6px 10px;
+}
+
+.product-card button,
+#products .product button {
+  margin-top: auto;
+}
