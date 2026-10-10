@@ -23,20 +23,16 @@ async function loadProducts() {
   (shops || []).forEach(s => { shopName[s.id] = s.name; });
 
   data = (rows || []).map(p => ({
-    id: p.id,
-    name: p.name,
-    cat: p.category || "Other",
-    price: Number(p.price),
-        shop: shopName[p.shop_id] || "Shop",
+
         id: p.id,
     name: p.name,
     cat: p.category || "Other",
     price: Number(p.price),
-        price: Number(p.price),
+ 
     stock: Number(p.stock ?? 0),
         shop: shopName[p.shop_id] || "Shop",
     icon: p.image_url ? "🛍️" : "📦",
-    icon: p.image_url ? "🛍️" : "📦",
+ 
     image: p.image_url || ""
   }));
 
