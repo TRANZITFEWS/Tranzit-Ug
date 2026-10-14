@@ -82,6 +82,7 @@ function add(id) {
   }
   if (existing) existing.qty = nextQty;
   else cart.push({ ...item, qty: 1 });
+  localStorage.setItem('tranzitCart', JSON.stringify(cart));
   document.querySelector("#cartCount").textContent = cart.reduce((s, x) => s + x.qty, 0);
   showCart();
 }
@@ -149,149 +150,15 @@ if (menuBtn && menuPanel) {
   menuPanel.querySelectorAll("a").forEach(link => {
     link.onclick = () => menuPanel.classList.remove("open");
   });
-}
 async function checkout() {
-  window.location.href = "checkout.html";
-return;
   if (!cart.length) {
     alert("Your cart is empty.");
     return;
   }
-  if (!currentUser) {
-    alert("Please log in first.");
-    window.location.href = "account.html";
-    return;
-  }
-
-  const phone = prompt("DELIVERY PHONE (example 0751234567):");
-  if (!phone) return;
-  const phoneDigits = phone.replace(/\D/g, "");
-  let deliveryPhone = phoneDigits;
-  if (deliveryPhone.startsWith("256") && deliveryPhone.length === 12) {
-    deliveryPhone = "0" + deliveryPhone.slice(3);
-  }
-  if (!/^0\d{9}$/.test(deliveryPhone)) {
-    alert("Delivery phone must be a number, e.g. 0751234567");
-    return;
-  }
-    const deliveryPrefix = deliveryPhone.slice(0, 3);
-  const ugPrefixes = ["070", "074", "075", "076", "077", "078", "079"];
-  if (!ugPrefixes.includes(deliveryPrefix)) {
-    alert("Delivery phone must be a real MTN or Airtel number.");
-    return;
-  }
-    if (/^(\d)\1+$/.test(deliveryPhone.slice(3))) {
-    alert("That delivery number looks fake.");
-    return;
-  }
-  const location = prompt("DELIVERY LOCATION (place name, not a phone number):");
-  if (!location) return;
-  if (/\d{7,}/.test(location)) {
-    alert("Location looks like a phone number. Please enter a place, e.g. Ndejje Zanta.");
-    return;
-  }
-  const place = location.trim();
-  const compact = place.replace(/\s/g, "");
-  if (place.length < 3 || !/[aeiou]/i.test(place) || /^(.{1,2})\1+$/i.test(compact)) {
-    alert("Enter a real place name, e.g. Ndejje Zanta.");
-    return;
-  }
-  const method = prompt("Pay with MTN or Airtel? Type MTN or Airtel:");
-  if (!method) return;
-  const network = method.trim().toUpperCase();
-  if (network !== "MTN" && network !== "AIRTEL") {
-    alert("Please type MTN or Airtel.");
-    return;
-  }
-
-  const momo = prompt("YOUR " + network + " NUMBER (the number you will pay from):");
-  if (!momo) return;
-
-  const digits = momo.replace(/\D/g, "");
-  let local = digits;
-  if (local.startsWith("256") && local.length === 12) local = "0" + local.slice(3);
-  if (!/^0\d{9}$/.test(local)) {
-    alert("Enter a valid Ugandan number, e.g. 0751234567");
-    return;
-  }
-
-  const prefix = local.slice(0, 3);
-  const mtn = ["076", "077", "078", "079"];
-  const airtel = ["075", "070", "074"];
-  if (network === "MTN" && !mtn.includes(prefix)) {
-      alert("That number is not MTN. Use 077, 078 or 076.");
-    return;
-  }
-    if (/^(\d)\1+$/.test(local.slice(3))) {
-    alert("That Mobile Money number looks fake.");
-    return;
-  }
-  if (network === "AIRTEL" && !airtel.includes(prefix)) {
-    alert("That number is not Airtel. Use 075, 070 or 074.");
-    return;
-  }
-  const total = cart.reduce((s, x) => s + x.price * (x.qty || 1), 0);
-
-  const { data: order, error } = await supabaseClient
-    .from("orders")
-    .insert({
-      buyer_id: currentUser.id,
-      buyer_name: currentUser.email,
-      buyer_phone: deliveryPhone,
-      buyer_location: location,
-      total: total,
-      status: "pending",
-       payment_method: network,
-      payment_phone: local,
-      payment_status: "unpaid"
-    })
-    .select()
-    .single();
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  const items = cart.map(x => ({
-    order_id: order.id,
-    product_id: x.id,
-    product_name: x.name,
-    price: x.price,
-    quantity: x.qty || 1
-  }));
-
-  const { error: itemError } = await supabaseClient
-    .from("order_items")
-    .insert(items);
-
-  if (itemError) {
-    alert(itemError.message);
-    return;
-  }
-  for (const x of cart) {
-    await supabaseClient.rpc("reduce_stock", {
-      p_id: x.id,
-      qty: x.qty || 1
-    });
-  }
-  cart = [];
-  localStorage.setItem("tranzitCart", JSON.stringify(cart));
-  document.querySelector("#cartCount").textContent = 0;
-  closeDrawer();
-  const { data: shops } = await supabaseClient
-    .from("shops")
-    .select("name, momo_network, momo_number")
-    .not("momo_number", "is", null)
-    .limit(1);
-
-  const shop = shops && shops[0];
-  const payTo = shop && shop.momo_number
-    ? shop.momo_network + " " + shop.momo_number
-    : "the seller";
-
-  alert("Order placed! Send UGX " + total.toLocaleString() + " to " + payTo + ". Pay from your " + network + " number " + local + ".");
+  localStorage.setItem('tranzitCart', JSON.stringify(cart));
+  window.location.href = "checkout.html";
 }
+
 // Start
 loadProducts();
 checkAuth();
