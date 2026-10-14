@@ -421,7 +421,7 @@
           <div>
             <strong>${o.buyer_name ||'Customer'}</strong>
                    <span>Order: ${String(o.id).slice(0, 8).toUpperCase()}</span>             
-
+${o.is_test ? '<span style="color:#c0392b;font-weight:bold;">🧪 TEST ORDER — NO REAL PAYMENT</span>' : ''}
             <span>Phone: ${o.buyer_phone || '-'}</span>
             <span>Location: ${o.buyer_location || '-'}</span>
             <span>Items: ${items || 'No items listed'}</span>
