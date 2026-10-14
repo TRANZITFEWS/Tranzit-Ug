@@ -84,34 +84,34 @@
     <section class="checkout-box">
       <h2>Delivery details</h2>
 
-      <label for="phone">Delivery phone</label>
+      <label for="deliveryPhone">Delivery phone</label>
       <input
-  id="deliveryPhone"
+        id="deliveryPhone"
         type="tel"
         placeholder="e.g. 0751234567"
       >
 
-      <label for="location">Delivery location</label>
+      <label for="deliveryLocation">Delivery location</label>
       <input
-id="deliveryLocation"
+        id="deliveryLocation"
         type="text"
-        placeholder="e.g. Ndejjje Zanta"
+        placeholder="e.g. Ndejje Zanta"
       >
     </section>
 
     <section class="checkout-box">
       <h2>Payment method</h2>
 
-      <label for="network">Mobile Money network</label>
- <select id="paymentNetwork">
+      <label for="paymentNetwork">Mobile Money network</label>
+      <select id="paymentNetwork">
         <option value="">Select network</option>
         <option value="MTN">MTN Mobile Money</option>
         <option value="AIRTEL">Airtel Money</option>
       </select>
 
-      <label for="paymentPhone">Mobile Money number</label>
+      <label for="paymentNumber">Mobile Money number</label>
       <input
-id="paymentNumber"
+        id="paymentNumber"
         type="tel"
         placeholder="Number you will pay from"
       >
@@ -139,22 +139,17 @@ id="paymentNumber"
   </main>
 
   <script>
-  const SUPABASE_URL = "https://mvqzrkaxuthhkicclfaf.supabase.co";
-const SUPABASE_KEY = "sb_publishable_8iaoevUboXIPBkja1GvozA_SCI5-m8f";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const cart = JSON.parse(
-      localStorage.getItem("tranzitCart") || "[]"
-    );
+    const SUPABASE_URL = "https://mvqzrkaxuthhkicclfaf.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_8iaoevUboXIPBkja1GvozA_SCI5-m8f";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const fmt = n =>
-      "UGX " + Number(n).toLocaleString();
+    const cart = JSON.parse(localStorage.getItem("tranzitCart") || "[]");
+    const fmt = n => "UGX " + Number(n).toLocaleString();
 
-    const orderItems =
-      document.getElementById("orderItems");
+    const orderItems = document.getElementById("orderItems");
 
     if (!cart.length) {
-      orderItems.innerHTML =
-        "<p>Your cart is empty.</p>";
+      orderItems.innerHTML = "<p>Your cart is empty.</p>";
     } else {
       orderItems.innerHTML = cart.map(item => `
         <div style="
@@ -164,89 +159,106 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
           padding:12px 0;
           border-bottom:1px solid #eee;
         ">
-          <span>
-            ${item.name} × ${item.qty || 1}
-          </span>
-
-          <strong>
-            ${fmt(item.price * (item.qty || 1))}
-          </strong>
+          <span>${item.name} × ${item.qty || 1}</span>
+          <strong>${fmt(item.price * (item.qty || 1))}</strong>
         </div>
       `).join("");
     }
 
     const total = cart.reduce(
-      (sum, item) =>
-        sum + item.price * (item.qty || 1),
+      (sum, item) => sum + item.price * (item.qty || 1),
       0
     );
 
-    document.getElementById(
-      "checkoutTotal"
-    ).textContent = fmt(total);
-document.getElementById("placeOrderBtn").onclick = async function () {
-  const phone = document.getElementById("deliveryPhone").value.trim();
-  const location = document.getElementById("deliveryLocation").value.trim();
-  const network = document.getElementById("paymentNetwork").value;
-  const momo = document.getElementById("paymentNumber").value.trim();
+    document.getElementById("checkoutTotal").textContent = fmt(total);
 
-  if (!phone || !location || !network || !momo) {
-    alert("Please complete all delivery and payment details.");
-    return;
-  }
+    document.getElementById("placeOrderBtn").onclick = async function () {
+      const phone = document.getElementById("deliveryPhone").value.trim();
+      const location = document.getElementById("deliveryLocation").value.trim();
+      const network = document.getElementById("paymentNetwork").value;
+      const momo = document.getElementById("paymentNumber").value.trim();
 
-const { data: { session } } = await supabaseClient.auth.getSession();
-const user = session?.user;
+      if (!phone || !location || !network || !momo) {
+        alert("Please complete all delivery and payment details.");
+        return;
+      }
 
-if (!user) {
-  alert("Please log in before placing your order.");
-  window.location.href = "account.html";
-  return;
-}
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const user = session?.user;
 
-const { data: order, error: orderError } = await supabaseClient
-  .from("orders")
-  .insert({
-    buyer_id: user.id,
-    buyer_name: user.email,
-    buyer_phone: phone,
-    buyer_location: location,
-    total: total,
-    status: "pending",
-    payment_method: network,
-    payment_phone: momo,
-    payment_status: "unpaid",
-    buyer_paid: false,
-    is_test: true
-  })
-  .select()
-  .single();
+      if (!user) {
+        alert("Please log in before placing your order.");
+        window.location.href = "account.html";
+        return;
+      }
 
-if (orderError) {
-  alert("Order could not be created: " + orderError.message);
-  return;
-}
+      const { data: order, error: orderError } = await supabaseClient
+        .from("orders")
+        .insert({
+          buyer_id: user.id,
+          buyer_name: user.email,
+          buyer_phone: phone,
+          buyer_location: location,
+          total: total,
+          status: "pending",
+          payment_method: network,
+          payment_phone: momo,
+          payment_status: "unpaid",
+          buyer_paid: false,
+          is_test: true
+        })
+        .select()
+        .single();
 
-const items = cart.map(item => ({
-  order_id: order.id,
-  product_id: item.id,
-  product_name: item.name,
-  price: item.price,
-  quantity: item.qty || 1
-}));
+      if (orderError) {
+        alert("Order could not be created: " + orderError.message);
+        return;
+      }
 
-const { error: itemError } = await supabaseClient
-  .from("order_items")
-  .insert(items);
+      const items = cart.map(item => ({
+        order_id: order.id,
+        product_id: item.id,
+        product_name: item.name,
+        price: item.price,
+        quantity: item.qty || 1
+      }));
 
-if (itemError) {
-  alert(itemError.message);
-  return;
-}
-localStorage.removeItem("tranzitCart");
+      const { error: itemError } = await supabaseClient
+        .from("order_items")
+        .insert(items);
 
-  window.location.href = "account.html";
-};
+      if (itemError) {
+        alert(itemError.message);
+        return;
+      }
+
+      for (const item of cart) {
+        await supabaseClient.rpc("reduce_stock", {
+          p_id: item.id,
+          qty: item.qty || 1
+        });
+      }
+
+      const { data: shops } = await supabaseClient
+        .from("shops")
+        .select("name, momo_network, momo_number")
+        .not("momo_number", "is", null)
+        .limit(1);
+
+      const shop = shops && shops[0];
+      const payTo = shop && shop.momo_number
+        ? shop.momo_network + " " + shop.momo_number
+        : "the seller";
+
+      alert(
+        "Order placed! Send " + fmt(total) +
+        " to " + payTo +
+        ". Pay from your " + network + " number " + momo + "."
+      );
+
+      localStorage.removeItem("tranzitCart");
+      window.location.href = "account.html";
+    };
   </script>
 
 </body>
