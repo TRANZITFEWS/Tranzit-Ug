@@ -216,7 +216,8 @@ const { data: order, error: orderError } = await supabaseClient
     payment_method: network,
     payment_phone: momo,
     payment_status: "unpaid",
-    buyer_paid: false
+    buyer_paid: false,
+    is_test: true
   })
   .select()
   .single();
