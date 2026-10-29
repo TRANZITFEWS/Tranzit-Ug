@@ -159,11 +159,15 @@
       const items = (o.order_items || [])
         .map(i => i.product_name + ' x' + i.quantity)
         .join(', ');
-      const claim = o.payment_status === 'paid'
-        ? 'Paid'
-        : o.buyer_paid
-          ? 'Waiting for seller to confirm'
-          : `<button onclick="claimPaid('${o.id}')">I have paid</button>`;
+      const claim = o.status === 'completed'
+  ? 'Order completed'
+  : o.status === 'cancelled'
+    ? 'Order cancelled'
+    : o.payment_status === 'paid'
+      ? 'Paid'
+      : o.buyer_paid
+        ? 'Waiting for seller to confirm'
+        : `<button onclick="claimPaid('${o.id}')">I have paid</button>`;
       return `<p><b>Order ${String(o.id).slice(0, 8).toUpperCase()}</b><br><b>${items}</b><br>UGX ${Number(o.total).toLocaleString()} • ${o.status}<br>${o.buyer_location || ''}<br>${claim}</p>`;
     }).join('');
   }
