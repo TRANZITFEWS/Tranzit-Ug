@@ -150,6 +150,7 @@ if (menuBtn && menuPanel) {
   menuPanel.querySelectorAll("a").forEach(link => {
     link.onclick = () => menuPanel.classList.remove("open");
   });
+}
 async function checkout() {
   if (!cart.length) {
     alert("Your cart is empty.");
