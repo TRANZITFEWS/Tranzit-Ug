@@ -250,15 +250,58 @@
         ? shop.momo_network + " " + shop.momo_number
         : "the seller";
 
-      alert(
-        "Order placed! Send " + fmt(total) +
-        " to " + payTo +
-        ". Pay from your " + network + " number " + momo + "."
-      );
+alert(
+  "Order placed! Send " + fmt(total) +
+  " to " + payTo +
+  ". Pay from your " + network + " number " + momo + "."
+);
 
-      localStorage.removeItem("tranzitCart");
-      window.location.href = "account.html";
-    };
+// Start Flutterwave Mobile Money payment
+await startFlutterwavePayment(
+  Date.now(),
+  total,
+  "buyer@tranzit.ug",
+  momo,
+  network
+);
+
+localStorage.removeItem("tranzitCart");
+window.location.href = "account.html";
+
+async function startFlutterwavePayment(orderId, amount, email, phone, network) {
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12cXpya2F4dXRoaGtpY2NsZmFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwODA0OTgsImV4cCI6MjEwNTY1Njg5OH0.I9hyJgYbislA8TVZXUs1ndQ3HNlIIwLzSsSGvE15yTo";
+  const FUNCTION_URL = "https://mvqzrkaxuthhkicclfaf.supabase.co/functions/v1/create-payment";
+
+  const res = await fetch(FUNCTION_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + ANON_KEY
+    },
+    body: JSON.stringify({
+      order_id: orderId,
+      amount: amount,
+      email: email,
+      phone: phone,
+      network: network,   // "MTN" or "AIRTEL"
+      name: "Buyer"
+    })
+  });
+
+  const data = await res.json();
+  console.log("Flutterwave response:", data);
+
+  if (data.ok && data.charge && data.charge.data) {
+    const note = data.charge.data.next_action?.payment_instruction?.note
+      || "Please check your phone and authorize the payment.";
+    alert("Payment started.\n\n" + note);
+    return data;
+  } else {
+    alert("Payment failed: " + (data.error || "Unknown error"));
+    console.error(data);
+    return null;
+  }
+} 
   </script>
 
 </body>
