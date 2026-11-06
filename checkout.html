@@ -267,7 +267,7 @@ await startFlutterwavePayment(
 
 localStorage.removeItem("tranzitCart");
 window.location.href = "account.html";
-
+    }
 async function startFlutterwavePayment(orderId, amount, email, phone, network) {
 const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12cXpya2F4dXRoaGtpY2NsZmFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwODA0OTgsImV4cCI6MjEwNTY1Njg5OH0.I9hyJgYbislA8TVZXUs1ndQ3HNlIIwLzSsSGvE15yTo";
   const FUNCTION_URL = "https://mvqzrkaxuthhkicclfaf.supabase.co/functions/v1/create-payment";
