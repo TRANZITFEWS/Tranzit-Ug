@@ -232,41 +232,21 @@
         return;
       }
 
-      for (const item of cart) {
-        await supabaseClient.rpc("reduce_stock", {
-          p_id: item.id,
-          qty: item.qty || 1
-        });
-      }
+    
+ 
 
-      const { data: shops } = await supabaseClient
-        .from("shops")
-        .select("name, momo_network, momo_number")
-        .not("momo_number", "is", null)
-        .limit(1);
 
-      const shop = shops && shops[0];
-      const payTo = shop && shop.momo_number
-        ? shop.momo_network + " " + shop.momo_number
-        : "the seller";
-
-alert(
-  "Order placed! Send " + fmt(total) +
-  " to " + payTo +
-  ". Pay from your " + network + " number " + momo + "."
-);
 
 // Start Flutterwave Mobile Money payment
 await startFlutterwavePayment(
-  Date.now(),
+  order.id,
   total,
-  "buyer@tranzit.ug",
+user.email,
   momo,
   network
 );
 
-localStorage.removeItem("tranzitCart");
-window.location.href = "account.html";
+
     }
 async function startFlutterwavePayment(orderId, amount, email, phone, network) {
 const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12cXpya2F4dXRoaGtpY2NsZmFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwODA4OTgsImV4cCI6MjEwNTY1Njg5OH0.I9hyJgYbis1aBTVZXUs1ndQ3HNlIIwLzSsSGvE15yTo";
