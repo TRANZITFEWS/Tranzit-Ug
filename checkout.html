@@ -251,12 +251,18 @@ user.email,
 async function startFlutterwavePayment(orderId, amount, email, phone, network) {
 const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12cXpya2F4dXRoaGtpY2NsZmFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwODA4OTgsImV4cCI6MjEwNTY1Njg5OH0.I9hyJgYbis1aBTVZXUs1ndQ3HNlIIwLzSsSGvE15yTo";
   const FUNCTION_URL = "https://mvqzrkaxuthhkicclfaf.supabase.co/functions/v1/create-payment";
+const { data: { session }, error: sessionError } =
+  await supabaseClient.auth.getSession();
 
+if (sessionError || !session?.access_token) {
+  alert("Please log in before making a payment.");
+  return null;
+}
   const res = await fetch(FUNCTION_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": "Bearer " + ANON_KEY
+"Authorization": "Bearer " + session.access_token
     },
     body: JSON.stringify({
       order_id: orderId,
