@@ -238,7 +238,9 @@
 
 
 // Start Flutterwave Mobile Money payment
-await startFlutterwavePayment(
+console.log("Order created:", order);
+console.log("Order ID being sent:", order.id);
+      await startFlutterwavePayment(
   order.id,
   total,
 user.email,
