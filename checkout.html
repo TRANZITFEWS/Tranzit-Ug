@@ -214,7 +214,8 @@
         alert("Order could not be created: " + orderError.message);
         return;
       }
-
+console.log("orderError:", orderError);
+console.log("order data:", order);
       const items = cart.map(item => ({
         order_id: order.id,
         product_id: item.id,
