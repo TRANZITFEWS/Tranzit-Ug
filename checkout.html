@@ -258,21 +258,22 @@ if (sessionError || !session?.access_token) {
   alert("Please log in before making a payment.");
   return null;
 }
-  const res = await fetch(FUNCTION_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-"Authorization": "Bearer " + session.access_token
-    },
-    body: JSON.stringify({
-      order_id: orderId,
-      amount: amount,
-      email: email,
-      phone: phone,
-      network: network,   // "MTN" or "AIRTEL"
-      name: "Buyer"
-    })
-  });
+const res = await fetch(FUNCTION_URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + session.access_token,
+    "apikey": ANON_KEY
+  },
+  body: JSON.stringify({
+    order_id: orderId,
+    amount: amount,
+    email: email,
+    phone: phone,
+    network: network,
+    name: "Buyer"
+  })
+});
 
   const data = await res.json();
   console.log("Flutterwave response:", data);
